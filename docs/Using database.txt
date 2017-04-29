@@ -5,7 +5,7 @@ inicjacje bazy danychm która zadzia³a w mmoim przypadku (gdy¿ niektóre znalezion
 
 private Realm realm; // jako pole prywatne
 
-// w onCreate
+// w onCreate()
 Realm.init(getApplicationContext());
 RealmConfiguration configuration = new RealmConfiguration.Builder().build();
 Realm.setDefaultConfiguration(configuration);
@@ -15,7 +15,30 @@ Standardowe operacje na obiektach w bazie wykonujemy za pomoc¹:
 
 realm.beginTransaction();
 // operacje na obiektach dziedzicz¹cych po RealmObject
+//stworzenie obiektu
+(Klasa) nazwa = realm.createObject((Klasa).class);
 realm.commitTransaction();
 
+Je¶li chcemy, aby transakcja by³a asynchroniczna (raczej bêdziemy chcieli) to wygl±da to trochê inaczej:
 
+realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm bgRealm) {
+                //operacje na obiektach dziedzicz±cych po RealmObject
+				//stworzenie obiektu
+				(Klasa) nazwa = realm.createObject((Klasa).class);
+            }
+        }, new Realm.Transaction.OnSuccess() {
+            @Override
+            public void onSuccess() {
+                // Transaction was a success.
+            }
+        }, new Realm.Transaction.OnError() {
+            @Override
+            public void onError(Throwable error) {
+                // Transaction failed and was automatically canceled.
+            }
+        });
+
+Dokumentacja Realma: https://realm.io/docs/
 
