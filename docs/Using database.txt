@@ -1,0 +1,21 @@
+Klasy, które dziedzicz¹ po klasie RealmObject s¹ obiektami bazy danych.
+
+Korzystanie z nich w kodzie wymaga najpierw utworzenia obiektu Realm. Ze wzglêdu na pewne komplikacje do³¹czam
+inicjacje bazy danychm która zadzia³a w mmoim przypadku (gdy¿ niektóre znalezione w internecie zwyczajnie rzuca³y b³êdy):
+
+private Realm realm; // jako pole prywatne
+
+// w onCreate
+Realm.init(getApplicationContext());
+RealmConfiguration configuration = new RealmConfiguration.Builder().build();
+Realm.setDefaultConfiguration(configuration);
+realm = Realm.getDefaultInstance();
+
+Standardowe operacje na obiektach w bazie wykonujemy za pomoc¹:
+
+realm.beginTransaction();
+// operacje na obiektach dziedzicz¹cych po RealmObject
+realm.commitTransaction();
+
+
+
