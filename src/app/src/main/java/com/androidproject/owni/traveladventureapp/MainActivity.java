@@ -36,8 +36,10 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Window;
+import android.view.WindowManager;
 
-public class MainActivity extends AppCompatActivity implements
+public class MainActivity extends FragmentActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, OnMapReadyCallback, LocationListener {
 
     GoogleApiClient mGoogleApiClient = null;
@@ -84,6 +86,12 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d("RAN", "onCreate: ");
+
+        // Remove title bar
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        // Remove notification bar
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         // Create an instance of GoogleAPIClient.
         if (mGoogleApiClient == null) {
