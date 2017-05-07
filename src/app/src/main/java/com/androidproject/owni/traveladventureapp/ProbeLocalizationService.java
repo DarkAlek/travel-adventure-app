@@ -13,6 +13,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
+import com.androidproject.owni.traveladventureapp.lib.LocalizationManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -35,6 +36,7 @@ public class ProbeLocalizationService
 
     GoogleApiClient mGoogleApiClient = null;
     LocationRequest mLocationRequest = null;
+    LocalizationManager localizationManager = null;
     //Boolean mRequestingLocationUpdates = true;
 
     public static void startServiceProbing(Context context) {
@@ -45,6 +47,8 @@ public class ProbeLocalizationService
     @Override
     public void onCreate() {
         super.onCreate();
+
+        localizationManager = new LocalizationManager();
 
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -91,10 +95,7 @@ public class ProbeLocalizationService
 
     @Override
     public void onLocationChanged(Location location) {
-        // TODO
-        // remove later debug logs
-        Log.e("ProbeLocalization", "onLocationChanged loc_lat: " + String.valueOf(location.getLatitude()));
-        Log.e("ProbeLocalization", "onLocationChanged loc_lon: " + String.valueOf(location.getLongitude()));
+        localizationManager.location_changed_handler(location);
 
         // TODO
         // mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
