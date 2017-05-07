@@ -18,9 +18,11 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyA2FXm9rIAF5W4tu64vISMhrNDPw_F7Oy8" />
 
+        <!--
+        removed: android:exported="false"
+        -->
         <service
             android:name=".ProbeLocalizationService"
-            android:exported="false"
             android:process=":probeLocalizationService" />
 
         <activity android:name=".MainActivity">
