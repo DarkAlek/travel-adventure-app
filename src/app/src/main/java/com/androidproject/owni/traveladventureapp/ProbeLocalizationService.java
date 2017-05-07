@@ -37,6 +37,7 @@ public class ProbeLocalizationService
     GoogleApiClient mGoogleApiClient = null;
     LocationRequest mLocationRequest = null;
     LocalizationManager localizationManager = null;
+
     //Boolean mRequestingLocationUpdates = true;
 
     public static void startServiceProbing(Context context) {
@@ -48,7 +49,7 @@ public class ProbeLocalizationService
     public void onCreate() {
         super.onCreate();
 
-        localizationManager = new LocalizationManager();
+        localizationManager = new LocalizationManager(getApplicationContext());
 
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -64,6 +65,7 @@ public class ProbeLocalizationService
     @Override
     public void onDestroy() {
         super.onDestroy();
+        localizationManager.CloseDatabase();
     }
 
     @Override
@@ -95,7 +97,7 @@ public class ProbeLocalizationService
 
     @Override
     public void onLocationChanged(Location location) {
-        localizationManager.location_changed_handler(location);
+        localizationManager.LocationChangedHandler(location);
 
         // TODO
         // mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());

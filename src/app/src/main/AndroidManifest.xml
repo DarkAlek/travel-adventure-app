@@ -20,7 +20,8 @@
 
         <service
             android:name=".ProbeLocalizationService"
-            android:exported="false" />
+            android:exported="false"
+            android:process=":probeLocalizationService" />
 
         <activity android:name=".MainActivity">
             <intent-filter>
