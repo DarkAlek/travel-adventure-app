@@ -40,6 +40,7 @@ public class LocalizationManager {
         dbLocation.setGeoWidth(location.getLongitude());
         dbLocation.setGeoHeight(location.getLatitude());
         dbLocation.setTimestamp(timestamp);
+        realm.insertOrUpdate(dbLocation);
         realm.commitTransaction();
 
         return true;
