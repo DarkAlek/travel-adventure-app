@@ -21,6 +21,7 @@
         <!--
         removed: android:exported="false"
         -->
+
         <service
             android:name=".ProbeLocalizationService"
             android:process=":probeLocalizationService" />

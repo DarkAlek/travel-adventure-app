@@ -21,41 +21,28 @@ public class LocalizationManager {
         realm = Realm.getDefaultInstance();
     }
 
-    public void LocationChangedHandler(Location location){
+    public boolean LocationChangedHandler(Location location){
         // TODO
         // add logic to save to db only valuable locations
 
-        AddLocalization(location);
+        return AddLocalization(location);
     }
 
-    public void AddLocalization(Location location){
+    public boolean AddLocalization(Location location){
         // TODO
         // remove later debug logs
-
         Log.e("AddLocalization", "loc_lat: " + String.valueOf(location.getLatitude()));
         Log.e("AddLocalization", "loc_lon: " + String.valueOf(location.getLongitude()));
 
-        // TODO
-        // add location to database
-
-        /*
         realm.beginTransaction();
-        Log.e("AddLocalization: ", "beginTransaction");
-
         Long timestamp = System.currentTimeMillis()/1000;
-        DBLocation dbLocation = realm.createObject(DBLocation.class);
-        Log.e("AddLocalization: ", "createObject");
+        DBLocation dbLocation = new DBLocation();
         dbLocation.setGeoWidth(location.getLongitude());
         dbLocation.setGeoHeight(location.getLatitude());
         dbLocation.setTimestamp(timestamp);
-        Log.e("AddLocalization: ", "setProperties");
-
         realm.commitTransaction();
-        Log.e("AddLocalization", "transactionEnd: " + String.valueOf(location.getLongitude()));
-        */
 
-        // TODO
-        // send notification to TravelMapFragment about current position
+        return true;
     }
 
     public void CloseDatabase(){

@@ -55,7 +55,7 @@ public class ProbeLocalizationService
 
     static final int MSG_REGISTER_CLIENT = 1;
     static final int MSG_UNREGISTER_CLIENT = 2;
-    static final int MSG_SET_VALUE = 3;
+    static final int MSG_LOCALIZATION = 3;
 
     class IncomingHandler extends Handler {
         @Override
@@ -67,6 +67,7 @@ public class ProbeLocalizationService
                 case MSG_UNREGISTER_CLIENT:
                     mClients.remove(msg.replyTo);
                     break;
+                /*
                 case MSG_SET_VALUE:
                     mValue = msg.arg1;
                     for (int i=mClients.size()-1; i>=0; i--) {
@@ -81,6 +82,7 @@ public class ProbeLocalizationService
                         }
                     }
                     break;
+                */
                 default:
                     super.handleMessage(msg);
             }
@@ -89,10 +91,14 @@ public class ProbeLocalizationService
 
     final Messenger mMessenger = new Messenger(new IncomingHandler());
 
-
     public static void startServiceProbing(Context context) {
         Intent intent = new Intent(context, ProbeLocalizationService.class);
         context.startService(intent);
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        return START_STICKY;
     }
 
     @Override
@@ -146,11 +152,10 @@ public class ProbeLocalizationService
 
     @Override
     public void onLocationChanged(Location location) {
-        localizationManager.LocationChangedHandler(location);
+        Boolean isValid = localizationManager.LocationChangedHandler(location);
 
-        // TODO
-        // mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
-        // save location to database here
+        if (isValid)
+            PropagateLocation(location);
     }
 
     @Override
@@ -231,6 +236,21 @@ public class ProbeLocalizationService
     protected void stopLocationUpdates() {
         LocationServices.FusedLocationApi.removeLocationUpdates(
                 mGoogleApiClient, this);
+    }
+
+    protected void PropagateLocation(Location location) {
+        for (int i=mClients.size()-1; i>=0; i--) {
+            try {
+                mClients.get(i).send(
+                        Message.obtain(null, MSG_LOCALIZATION, location)
+                );
+            } catch (RemoteException e) {
+                // The client is dead.  Remove it from the list;
+                // we are going through the list from back to front
+                // so this is safe to do inside the loop.
+                mClients.remove(i);
+            }
+        }
     }
 }
 

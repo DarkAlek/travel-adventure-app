@@ -8,21 +8,7 @@ import android.location.Location;
 
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.RemoteException;
 import android.support.v4.app.FragmentActivity;
-
-import com.google.android.gms.maps.*;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-
-import android.util.Log;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.TextView;
 
 public class MainActivity extends FragmentActivity implements TravelMapFragment.OnFragmentInteractionListener {
 

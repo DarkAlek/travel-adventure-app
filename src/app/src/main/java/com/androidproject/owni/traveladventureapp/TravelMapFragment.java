@@ -45,8 +45,15 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case ProbeLocalizationService.MSG_SET_VALUE:
+                case ProbeLocalizationService.MSG_LOCALIZATION:
                     //mCallbackText.setText("Received from service: " + msg.arg1);
+                    mLastLocation = (Location) msg.obj;
+
+                    if (mLastLocation != null) {
+                        mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude())).title("Marker"));
+                        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()), 10));
+                    }
+
                     break;
                 default:
                     super.handleMessage(msg);
@@ -65,11 +72,6 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
     private ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className,
                                        IBinder service) {
-            // This is called when the connection with the service has been
-            // established, giving us the service object we can use to
-            // interact with the service.  We are communicating with our
-            // service through an IDL interface, so get a client-side
-            // representation of that from the raw service object.
             mService = new Messenger(service);
             //mCallbackText.setText("Attached.");
 
@@ -82,9 +84,11 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
                 mService.send(msg);
 
                 // Give it some value as an example.
+                /*
                 msg = Message.obtain(null,
                         ProbeLocalizationService.MSG_SET_VALUE, this.hashCode(), 0);
                 mService.send(msg);
+                */
             } catch (RemoteException e) {
                 // In this case the service has crashed before we could even
                 // do anything with it; we can count on soon being
