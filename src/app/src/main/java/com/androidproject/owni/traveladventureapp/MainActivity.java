@@ -23,6 +23,12 @@ import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
+import android.support.v7.widget.AppCompatButton;
+import android.util.Log;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
 
 public class MainActivity extends FragmentActivity implements TravelMapFragment.OnFragmentInteractionListener {
 
@@ -41,6 +47,17 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
                 getSupportFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.map, mapFragment);
         fragmentTransaction.commit();
+
+        AppCompatButton clickButton = (AppCompatButton) findViewById(R.id.route_activity);
+        clickButton.setOnClickListener( new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this, RoutesActivity.class);
+                i.putExtra("TITLE", "Routes");
+                startActivityForResult(i, 1);
+            }
+        });
     }
 
     public void askAboutLocalizationPermissions()

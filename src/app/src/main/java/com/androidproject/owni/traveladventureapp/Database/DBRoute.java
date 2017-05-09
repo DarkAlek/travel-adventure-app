@@ -14,6 +14,9 @@ public class DBRoute extends RealmObject{
     private long id;
 
     private String name;
+
+    private long timestamp;
+
     private RealmList<DBLocation> route;
 
     public long getId() {
@@ -38,5 +41,13 @@ public class DBRoute extends RealmObject{
 
     public void setRoute(RealmList<DBLocation> route) {
         this.route = route;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 }
