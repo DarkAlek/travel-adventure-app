@@ -6,4 +6,6 @@
     android:layout_height="match_parent"
     tools:context="com.androidproject.owni.traveladventureapp.RoutesActivity">
 
+    <include layout="@layout/content_routes" />
+
 </android.support.constraint.ConstraintLayout>
