@@ -37,10 +37,11 @@ public class LocalizationManager {
         realm.beginTransaction();
         Long timestamp = System.currentTimeMillis()/1000;
         DBLocation dbLocation = new DBLocation();
+        dbLocation.setId(timestamp);
         dbLocation.setGeoWidth(location.getLongitude());
         dbLocation.setGeoHeight(location.getLatitude());
         dbLocation.setTimestamp(timestamp);
-        realm.insertOrUpdate(dbLocation);
+        realm.insert(dbLocation);
         realm.commitTransaction();
 
         return true;

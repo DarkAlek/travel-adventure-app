@@ -10,6 +10,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
+import com.androidproject.owni.traveladventureapp.database.DBLocation;
+
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
+
 public class MainActivity extends FragmentActivity implements TravelMapFragment.OnFragmentInteractionListener {
 
     @Override
