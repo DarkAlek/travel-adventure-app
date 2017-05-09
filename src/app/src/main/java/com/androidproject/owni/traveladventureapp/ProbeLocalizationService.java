@@ -94,7 +94,7 @@ public class ProbeLocalizationService
     public static void startServiceProbing(Context context) {
         Intent intent = new Intent(context, ProbeLocalizationService.class);
         context.startService(intent);
-    }
+}
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {

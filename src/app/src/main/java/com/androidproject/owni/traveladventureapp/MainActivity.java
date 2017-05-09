@@ -4,11 +4,14 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.location.Location;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -26,6 +29,8 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        askAboutLocalizationPermissions();
+
         ProbeLocalizationService.startServiceProbing(this);
 
         setContentView(R.layout.activity_main);
@@ -36,6 +41,14 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
                 getSupportFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.map, mapFragment);
         fragmentTransaction.commit();
+    }
+
+    public void askAboutLocalizationPermissions()
+    {
+        if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
+            ActivityCompat.requestPermissions( this, new String[] {  android.Manifest.permission.ACCESS_COARSE_LOCATION  }, 23 );}
+        if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
+            ActivityCompat.requestPermissions( this, new String[] {  android.Manifest.permission.ACCESS_COARSE_LOCATION  }, 23 ); }
     }
 
     @Override
