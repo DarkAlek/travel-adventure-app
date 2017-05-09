@@ -4,7 +4,7 @@ import android.content.Context;
 import android.location.Location;
 import android.util.Log;
 
-import com.androidproject.owni.traveladventureapp.database.DBLocation;
+import com.androidproject.owni.traveladventureapp.Database.DBLocation;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;

@@ -1,4 +1,4 @@
-package com.androidproject.owni.traveladventureapp.database;
+package com.androidproject.owni.traveladventureapp.Database;
 
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;

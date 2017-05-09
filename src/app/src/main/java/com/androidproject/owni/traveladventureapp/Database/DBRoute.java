@@ -1,4 +1,4 @@
-package com.androidproject.owni.traveladventureapp.database;
+package com.androidproject.owni.traveladventureapp.Database;
 
 import io.realm.RealmList;
 import io.realm.RealmObject;
