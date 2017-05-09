@@ -1,18 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    >
     <item
-        android:id="@+id/new_trip"
-        android:title="New" />
+        android:id="@+id/current_travel"
+        android:title="Current trip" />
     <item
-        android:id="@+id/edit_trip"
-        android:title="Edit" />
-    <item
-        android:id="@+id/load_trip"
-        android:title="Load" />
-    <item
-        android:id="@+id/remove_trip"
-        android:title="Remove" />
-    <item
-        android:id="@+id/logout"
-        android:title="Logout" />
+        android:id="@+id/travel_list"
+        android:title="Travel list" />
 </menu>
