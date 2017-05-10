@@ -17,12 +17,8 @@
         android:layout_height="match_parent"
         android:id="@+id/navigation_view"
         android:layout_gravity="start"
+        app:headerLayout="@layout/drawer_header"
         app:menu="@menu/drawer_menu" />
-
-    <android.support.v7.widget.AppCompatButton
-        android:id="@+id/route_activity"
-        android:layout_width="60dp"
-        android:layout_height="60dp" />
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         android:name="com.google.android.gms.maps.SupportMapFragment"

@@ -9,9 +9,11 @@ import android.location.Location;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -32,6 +34,9 @@ import android.widget.Button;
 
 public class MainActivity extends FragmentActivity implements TravelMapFragment.OnFragmentInteractionListener {
 
+    private NavigationView navigationView;
+    private DrawerLayout drawerLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,46 +53,44 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
         fragmentTransaction.add(R.id.map, mapFragment);
         fragmentTransaction.commit();
 
-        AppCompatButton clickButton = (AppCompatButton) findViewById(R.id.route_activity);
-        clickButton.setOnClickListener( new View.OnClickListener() {
+        initNavigationView();
 
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(MainActivity.this, RoutesActivity.class);
-                i.putExtra("TITLE", "Routes");
-                startActivityForResult(i, 1);
-            }
-        });
     }
 
-    public void askAboutLocalizationPermissions()
-    {
+    public void askAboutLocalizationPermissions() {
+
         if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
             ActivityCompat.requestPermissions( this, new String[] {  android.Manifest.permission.ACCESS_COARSE_LOCATION  }, 23 );}
         if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
             ActivityCompat.requestPermissions( this, new String[] {  android.Manifest.permission.ACCESS_COARSE_LOCATION  }, 23 ); }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.drawer_menu, menu);
-        return true;
+    public void initNavigationView(){
+
+        drawerLayout = (DrawerLayout) findViewById(R.id.activity_main);
+
+        navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        navigationView.bringToFront();
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem menuItem) {
+                int id = menuItem.getItemId();
+                menuItem.setChecked(true);
+                switch (id) {
+                    case R.id.current_travel:
+                        showCurrentTravel();
+                        drawerLayout.closeDrawers();
+                        return true;
+                    case R.id.travel_list:
+                        showTravelList();
+                        drawerLayout.closeDrawers();
+                        return true;
+                }
+                return false;
+            }
+        });
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.current_travel:
-                showCurrentTravel();
-                return true;
-            case R.id.travel_list:
-                showTravelList();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
 
     public void showCurrentTravel() {
         TravelMapFragment mapFragment = new TravelMapFragment();
@@ -101,6 +104,9 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
     public void showTravelList() {
         // TODO
         // show travel list
+        Intent i = new Intent(MainActivity.this, RoutesActivity.class);
+        i.putExtra("TITLE", "Routes");
+        startActivityForResult(i, 1);
     }
 
     @Override
