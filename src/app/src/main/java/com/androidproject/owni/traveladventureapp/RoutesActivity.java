@@ -11,7 +11,7 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.androidproject.owni.traveladventureapp.Database.DBRoute;
+import com.androidproject.owni.traveladventureapp.database.DBRoute;
 import com.github.vipulasri.timelineview.TimelineView;
 
 import java.util.ArrayList;

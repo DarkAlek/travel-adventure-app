@@ -19,7 +19,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.androidproject.owni.traveladventureapp.Database.DBLocation;
+import com.androidproject.owni.traveladventureapp.database.DBLocation;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
