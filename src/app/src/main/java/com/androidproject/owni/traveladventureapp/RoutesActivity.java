@@ -96,7 +96,6 @@ public class RoutesActivity extends AppCompatActivity {
 //        realm.deleteAll();
 //        realm.commitTransaction();
         RealmResults<DBRoute>  routeResults = realm.where(DBRoute.class).findAllSorted("timestamp", Sort.DESCENDING);
-
         for(DBRoute item:routeResults) dataSet.add(item);
     }
 
@@ -132,7 +131,7 @@ public class RoutesActivity extends AppCompatActivity {
         routesItems = (RecyclerView)findViewById(R.id.routes_items);
         routesItems.setLayoutManager(new LinearLayoutManager(this));
 
-        mockRoutes();
+        //mockRoutes();
         initializeDataSet();
         routesItems.setAdapter(routesItemsAdapter);
     }

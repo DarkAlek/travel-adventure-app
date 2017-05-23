@@ -5,6 +5,7 @@ import android.location.Location;
 import android.util.Log;
 
 import com.androidproject.owni.traveladventureapp.database.DBLocation;
+import com.androidproject.owni.traveladventureapp.database.DBRoute;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
@@ -34,6 +35,8 @@ public class LocalizationManager {
         Log.e("AddLocalization", "loc_lat: " + String.valueOf(location.getLatitude()));
         Log.e("AddLocalization", "loc_lon: " + String.valueOf(location.getLongitude()));
 
+        DBRoute dbRoute = realm.where(DBRoute.class).equalTo("isRunning", Boolean.TRUE).findFirst();
+
         realm.beginTransaction();
         Long timestamp = System.currentTimeMillis()/1000;
         DBLocation dbLocation = new DBLocation();
@@ -41,13 +44,11 @@ public class LocalizationManager {
         dbLocation.setGeoWidth(location.getLongitude());
         dbLocation.setGeoHeight(location.getLatitude());
         dbLocation.setTimestamp(timestamp);
-        realm.insert(dbLocation);
+        dbRoute.getRoute().add(dbLocation);
+        realm.insertOrUpdate(dbLocation);
+        realm.insertOrUpdate(dbRoute);
         realm.commitTransaction();
 
         return true;
-    }
-
-    public void CloseDatabase(){
-        realm.close();
     }
 }

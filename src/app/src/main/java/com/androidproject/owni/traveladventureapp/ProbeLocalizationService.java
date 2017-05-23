@@ -121,7 +121,6 @@ public class ProbeLocalizationService
     @Override
     public void onDestroy() {
         super.onDestroy();
-        localizationManager.CloseDatabase();
     }
 
     @Override

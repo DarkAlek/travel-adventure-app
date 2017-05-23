@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
@@ -24,7 +25,7 @@ import io.realm.RealmResults;
 
 import android.widget.EditText;
 
-public class MainActivity extends Activity implements TravelMapFragment.OnFragmentInteractionListener {
+public class MainActivity extends FragmentActivity implements TravelMapFragment.OnFragmentInteractionListener {
 
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
@@ -40,8 +41,9 @@ public class MainActivity extends Activity implements TravelMapFragment.OnFragme
 
         TravelMapFragment mapFragment = new TravelMapFragment();
         //mapFragment.setArguments(args);
-        android.app.FragmentTransaction fragmentTransaction =
-                getFragmentManager().beginTransaction();
+        android.support.v4.app.FragmentTransaction fragmentTransaction =
+                getSupportFragmentManager().beginTransaction();
+
         fragmentTransaction.add(R.id.map, mapFragment);
         fragmentTransaction.commit();
 
@@ -126,7 +128,6 @@ public class MainActivity extends Activity implements TravelMapFragment.OnFragme
         else
             showAddNewTravelDialog();
 
-        db.close();
     }
 
     public void showAddNewTravelDialog(){
@@ -152,20 +153,23 @@ public class MainActivity extends Activity implements TravelMapFragment.OnFragme
         realm.beginTransaction();
         Long timestamp = System.currentTimeMillis()/1000;
         DBRoute dbRoute = new DBRoute();
-        dbRoute.setId(timestamp);
+        dbRoute.setId(timestamp.toString());
+        dbRoute.setTimestamp(System.currentTimeMillis());
         dbRoute.setName(travelName);
         dbRoute.setIsRunning(Boolean.TRUE);
         realm.insert(dbRoute);
         realm.commitTransaction();
 
-        db.close();
     }
 
     public void showCurrentTravel() {
         TravelMapFragment mapFragment = new TravelMapFragment();
         //mapFragment.setArguments(args);
-        android.app.FragmentTransaction fragmentTransaction =
-                getFragmentManager().beginTransaction();
+        //android.app.FragmentTransaction fragmentTransaction =
+        //        getFragmentManager().beginTransaction();
+        android.support.v4.app.FragmentTransaction fragmentTransaction =
+                getSupportFragmentManager().beginTransaction();
+
         fragmentTransaction.add(R.id.map, mapFragment);
         fragmentTransaction.commit();
     }

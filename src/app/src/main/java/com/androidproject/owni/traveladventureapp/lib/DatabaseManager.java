@@ -22,9 +22,4 @@ public class DatabaseManager {
     public Realm getRealmObject() {
         return realm;
     }
-
-    public void close() {
-        if (!realm.isClosed())
-            realm.close();
-    }
 }

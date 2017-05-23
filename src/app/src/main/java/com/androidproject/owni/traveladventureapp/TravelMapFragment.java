@@ -1,6 +1,6 @@
 package com.androidproject.owni.traveladventureapp;
 
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -261,7 +261,7 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onResume() {
         super.onResume();
-        //MapFragment smf = ((MapFragment) getFragmentManager().findFragmentById(R.id.map));
-        //smf.getMapAsync(this);
+        SupportMapFragment smf = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map));
+        smf.getMapAsync(this);
     }
 }
