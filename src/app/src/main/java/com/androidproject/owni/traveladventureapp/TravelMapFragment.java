@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.androidproject.owni.traveladventureapp.Database.DBLocation;
+import com.androidproject.owni.traveladventureapp.Database.DBRoute;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -28,8 +29,10 @@ import com.google.android.gms.maps.model.LatLng;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import io.realm.RealmList;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
+import io.realm.Sort;
 
 
 public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
@@ -40,6 +43,7 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
     Messenger mService = null;
     Realm realm;
     boolean mIsBound;
+    String routeID;
     final Messenger mMessenger = new Messenger(new IncomingHandler());
 
     class IncomingHandler extends Handler {
@@ -87,6 +91,26 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
         realm.commitTransaction();
 
         centerAtLocation(mLastLocation);
+    }
+
+    private void loadCurrentRoute() {
+
+        DBRoute route = realm.where(DBRoute.class).equalTo("id", routeID).findFirst();
+        RealmList<DBLocation> routePoints = route.getRoute();
+
+        for (int i = 0; i < routePoints.size(); i++) {
+            DBLocation location = routePoints.get(i);
+
+            Location aLocation = new Location("");
+            aLocation.setLongitude(location.getGeoWidth());
+            aLocation.setLatitude(location.getGeoHeight());
+
+            addPointToMap(aLocation);
+            mLastLocation = aLocation;
+        }
+
+        centerAtLocation(mLastLocation);
+
     }
 
     private void centerAtLocation(Location location) {
@@ -165,6 +189,11 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
         RealmConfiguration configuration = new RealmConfiguration.Builder().build();
         Realm.setDefaultConfiguration(configuration);
         realm = Realm.getDefaultInstance();
+        Bundle args = getArguments();
+        // showing chosen route
+        if(args != null) {
+            routeID = args.getString("ROUTES_ID");
+        }
 
         doBindService();
     }
@@ -220,7 +249,11 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
             mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()), 13));
         }
 
-        loadAllPointsToMap();
+        //loadAllPointsToMap();
+        if(routeID != null) {
+            loadCurrentRoute();
+        }
+        else loadAllPointsToMap();
     }
 
     @Override

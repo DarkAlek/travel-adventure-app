@@ -1,5 +1,6 @@
 package com.androidproject.owni.traveladventureapp;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
@@ -11,13 +12,18 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.androidproject.owni.traveladventureapp.Database.DBLocation;
 import com.androidproject.owni.traveladventureapp.Database.DBRoute;
 import com.github.vipulasri.timelineview.TimelineView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import io.realm.Realm;
+import io.realm.RealmList;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
@@ -48,10 +54,25 @@ public class RoutesActivity extends AppCompatActivity {
             final DBRoute currentItem = dataSet.get(position);
             RouteViewHolder h = (RouteViewHolder)holder;
             h.routeName.setText(currentItem.getName());
-            h.routeDate.setText(String.valueOf(currentItem.getTimestamp()));
 
-            // operacje na obiektach Routes
+            SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy, HH:mm");
+            Date resultDate = new Date(currentItem.getTimestamp());
+            h.routeDate.setText(sdf.format(resultDate));
+            h.routeCard.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // show route
+                    Intent intent = new Intent(RoutesActivity.this, MainActivity.class);
+                    intent.putExtra("ROUTES_ID", currentItem.getId());
+                    startActivity(intent);
 
+                    //realm.beginTransaction();
+                    //currentItem.setTimestamp(System.currentTimeMillis());
+                    //realm.commitTransaction();
+                    //initializeDataSet();
+                    //routesItemsAdapter.notifyDataSetChanged();
+                }
+            });
         }
 
         @Override
@@ -67,17 +88,31 @@ public class RoutesActivity extends AppCompatActivity {
 
 
     private void initializeDataSet() {
+
         dataSet = new ArrayList<>();
+//        realm.beginTransaction();
+//        realm.deleteAll();
+//        realm.commitTransaction();
+        RealmResults<DBRoute>  routeResults = realm.where(DBRoute.class).findAllSorted("timestamp", Sort.DESCENDING);
+
+        for(DBRoute item:routeResults) dataSet.add(item);
+    }
+
+    // to mock objects
+    private void mockRoutes() {
 
         DBRoute routeItem = new DBRoute();
-        routeItem.setName("Route");
-        routeItem.setTimestamp(1);
-        dataSet.add(routeItem);
-        dataSet.add(routeItem);
-        dataSet.add(routeItem);
-        dataSet.add(routeItem);
-        dataSet.add(routeItem);
-        dataSet.add(routeItem);
+        RealmList<DBLocation> locationsList= new RealmList<DBLocation>();
+        locationsList.addAll(realm.where(DBLocation.class).findAllSorted("timestamp", Sort.DESCENDING).subList(0,3));
+
+        routeItem.setName("My Route");
+        routeItem.setId(UUID.randomUUID().toString());
+        routeItem.setTimestamp(System.currentTimeMillis());
+        routeItem.setRoute(locationsList);
+        realm.beginTransaction();
+        realm.copyToRealmOrUpdate(routeItem);
+        realm.commitTransaction();
+
     }
 
     @Override
@@ -89,9 +124,13 @@ public class RoutesActivity extends AppCompatActivity {
             setTitle(getIntent().getStringExtra("TITLE"));
         }
 
+        realm = Realm.getDefaultInstance();
+
+
         routesItems = (RecyclerView)findViewById(R.id.routes_items);
         routesItems.setLayoutManager(new LinearLayoutManager(this));
 
+        mockRoutes();
         initializeDataSet();
         routesItems.setAdapter(routesItemsAdapter);
     }
