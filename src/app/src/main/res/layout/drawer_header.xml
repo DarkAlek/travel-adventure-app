@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="250dp"
-    android:background="@drawable/background"
+    android:background="@drawable/drawer_header"
     android:gravity="bottom"
     android:orientation="vertical"
     android:padding="16dp"
@@ -13,7 +13,7 @@
         android:id="@+id/textView"
         android:layout_width="286dp"
         android:layout_height="wrap_content"
-        android:text="TravelAdventureApp"
+        android:text="Distance:"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:layout_weight="0.07" />
 </LinearLayout>

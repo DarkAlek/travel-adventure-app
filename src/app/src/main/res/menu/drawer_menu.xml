@@ -4,12 +4,15 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/start_travel"
-            android:title="Start travel" />
+            android:title="Start travel"
+            android:icon="@drawable/start_travel"/>
         <item
             android:id="@+id/current_travel"
-            android:title="Current trip" />
+            android:title="Current trip"
+            android:icon="@drawable/current_trip"/>
         <item
             android:id="@+id/travel_list"
-            android:title="Travel list" />
+            android:title="Travel list"
+            android:icon="@drawable/travel_list"/>
     </group>
 </menu>
