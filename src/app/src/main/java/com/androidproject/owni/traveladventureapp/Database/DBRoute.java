@@ -11,7 +11,7 @@ import io.realm.annotations.PrimaryKey;
 public class DBRoute extends RealmObject{
 
     @PrimaryKey
-    private long id;
+    private String id;
 
     private Boolean isRunning;
 
@@ -20,16 +20,16 @@ public class DBRoute extends RealmObject{
     private long timestamp;
 
     private RealmList<DBLocation> route;
-
+	
     public Boolean getIsRunning() { return isRunning; }
 
     public void setIsRunning(Boolean isRunning) { this.isRunning = isRunning; }
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

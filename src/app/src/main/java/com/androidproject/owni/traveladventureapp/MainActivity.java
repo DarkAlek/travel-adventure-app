@@ -47,6 +47,13 @@ public class MainActivity extends Activity implements TravelMapFragment.OnFragme
 
         initNavigationView();
 
+        if(getIntent().hasExtra("ROUTES_ID")) {
+
+            Bundle args = new Bundle();
+            args.putString("ROUTES_ID", getIntent().getExtras().getString("ROUTES_ID"));
+            mapFragment.setArguments(args);
+        }
+
     }
 
     public void askAboutLocalizationPermissions() {
