@@ -13,11 +13,17 @@ public class DBRoute extends RealmObject{
     @PrimaryKey
     private long id;
 
+    private Boolean isRunning;
+
     private String name;
 
     private long timestamp;
 
     private RealmList<DBLocation> route;
+
+    public Boolean getIsRunning() { return isRunning; }
+
+    public void setIsRunning(Boolean isRunning) { this.isRunning = isRunning; }
 
     public long getId() {
         return id;
