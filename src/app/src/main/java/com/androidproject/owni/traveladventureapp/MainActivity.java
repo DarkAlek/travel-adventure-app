@@ -94,8 +94,6 @@ public class MainActivity extends Activity implements TravelMapFragment.OnFragme
         final DBRoute dbRoute = query.findFirst();
         realm.commitTransaction();
 
-        // TODO
-        // edit to handle > 0 in production version
         if (dbRoute != null)
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -103,7 +101,8 @@ public class MainActivity extends Activity implements TravelMapFragment.OnFragme
             builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     realm.beginTransaction();
-                    dbRoute.deleteFromRealm();
+                    dbRoute.setIsRunning(Boolean.FALSE);
+                    //realm.copyToRealmOrUpdate(dbRoute);
                     realm.commitTransaction();
 
                     showAddNewTravelDialog();
