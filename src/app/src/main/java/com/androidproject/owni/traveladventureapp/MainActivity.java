@@ -1,38 +1,30 @@
 package com.androidproject.owni.traveladventureapp;
 import android.app.Activity;
-import android.content.ComponentName;
-import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
-import android.location.Location;
 
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.view.Menu;
-import android.view.MenuInflater;
+import android.support.v7.app.AlertDialog;
+import android.text.InputType;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.androidproject.owni.traveladventureapp.database.DBLocation;
+import com.androidproject.owni.traveladventureapp.database.DBRoute;
+import com.androidproject.owni.traveladventureapp.lib.DatabaseManager;
 
 import io.realm.Realm;
-import io.realm.RealmConfiguration;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
-import android.support.v7.widget.AppCompatButton;
-import android.util.Log;
-import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.Button;
 
-public class MainActivity extends FragmentActivity implements TravelMapFragment.OnFragmentInteractionListener {
+import android.widget.EditText;
+
+public class MainActivity extends Activity implements TravelMapFragment.OnFragmentInteractionListener {
 
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
@@ -48,8 +40,8 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
 
         TravelMapFragment mapFragment = new TravelMapFragment();
         //mapFragment.setArguments(args);
-        android.support.v4.app.FragmentTransaction fragmentTransaction =
-                getSupportFragmentManager().beginTransaction();
+        android.app.FragmentTransaction fragmentTransaction =
+                getFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.map, mapFragment);
         fragmentTransaction.commit();
 
@@ -74,6 +66,10 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
                 int id = menuItem.getItemId();
                 menuItem.setChecked(true);
                 switch (id) {
+                    case R.id.start_travel:
+                        startNewTravelDialog();
+                        drawerLayout.closeDrawers();
+                        return true;
                     case R.id.current_travel:
                         showCurrentTravel();
                         drawerLayout.closeDrawers();
@@ -88,12 +84,82 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
         });
     }
 
+    public void startNewTravelDialog() {
+        DatabaseManager db = new DatabaseManager(getApplicationContext());
+        final Realm realm = db.getRealmObject();
+
+        realm.beginTransaction();
+        RealmQuery<DBRoute> query = realm.where(DBRoute.class);
+        query.equalTo("isRunning", Boolean.TRUE);
+        final DBRoute dbRoute = query.findFirst();
+        realm.commitTransaction();
+
+        // TODO
+        // edit to handle > 0 in production version
+        if (dbRoute != null)
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setMessage("fire missiles?");
+            builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    realm.beginTransaction();
+                    dbRoute.deleteFromRealm();
+                    realm.commitTransaction();
+
+                    showAddNewTravelDialog();
+                }
+            });
+            builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    // User cancelled the dialog
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
+        else
+            showAddNewTravelDialog();
+
+        db.close();
+    }
+
+    public void showAddNewTravelDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setMessage("fire missiles2?");
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                addNewTravel(input.getText().toString());
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    public void addNewTravel(String travelName){
+        DatabaseManager db = new DatabaseManager(MainActivity.this);
+        Realm realm = db.getRealmObject();
+
+        realm.beginTransaction();
+        Long timestamp = System.currentTimeMillis()/1000;
+        DBRoute dbRoute = new DBRoute();
+        dbRoute.setId(timestamp);
+        dbRoute.setName(travelName);
+        dbRoute.setIsRunning(Boolean.TRUE);
+        realm.insert(dbRoute);
+        realm.commitTransaction();
+
+        db.close();
+    }
 
     public void showCurrentTravel() {
         TravelMapFragment mapFragment = new TravelMapFragment();
         //mapFragment.setArguments(args);
-        android.support.v4.app.FragmentTransaction fragmentTransaction =
-                getSupportFragmentManager().beginTransaction();
+        android.app.FragmentTransaction fragmentTransaction =
+                getFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.map, mapFragment);
         fragmentTransaction.commit();
     }

@@ -1,5 +1,6 @@
 package com.androidproject.owni.traveladventureapp;
 
+import android.app.Fragment;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -13,7 +14,6 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import com.androidproject.owni.traveladventureapp.database.DBLocation;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CircleOptions;
@@ -122,7 +123,7 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
     };
 
     void doBindService() {
-        getActivity().bindService(new Intent(getContext(),
+        getActivity().bindService(new Intent(getActivity().getApplicationContext(),
                 ProbeLocalizationService.class), mConnection, Context.BIND_AUTO_CREATE);
         mIsBound = true;
     }
@@ -161,7 +162,7 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Realm.init(getContext());
+        Realm.init(getActivity().getApplicationContext());
         RealmConfiguration configuration = new RealmConfiguration.Builder().build();
         Realm.setDefaultConfiguration(configuration);
         realm = Realm.getDefaultInstance();
@@ -226,7 +227,7 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onResume() {
         super.onResume();
-        SupportMapFragment smf = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map));
-        smf.getMapAsync(this);
+        //MapFragment smf = ((MapFragment) getFragmentManager().findFragmentById(R.id.map));
+        //smf.getMapAsync(this);
     }
 }

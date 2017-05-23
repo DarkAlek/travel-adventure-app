@@ -2,11 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     >
     <group android:checkableBehavior="single">
-    <item
-        android:id="@+id/current_travel"
-        android:title="Current trip" />
-    <item
-        android:id="@+id/travel_list"
-        android:title="Travel list" />
+        <item
+            android:id="@+id/start_travel"
+            android:title="Start travel" />
+        <item
+            android:id="@+id/current_travel"
+            android:title="Current trip" />
+        <item
+            android:id="@+id/travel_list"
+            android:title="Travel list" />
     </group>
 </menu>
