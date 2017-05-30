@@ -2,31 +2,30 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginLeft="10dp"
-    android:layout_marginRight="10dp">
+    android:layout_marginLeft="16dp"
+    android:layout_marginRight="16dp"
+    android:orientation="horizontal">
 
     <com.github.vipulasri.timelineview.TimelineView
         android:id="@+id/route_marker"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        app:markerSize="20dp"
-        app:lineSize="3dp"
         app:line="@color/colorPrimary"
-        app:marker="@drawable/marker"
-        app:linePadding="5dp"/>
+        app:linePadding="5dp"
+        app:lineSize="3dp"
+        app:marker="@drawable/marker_inactive"
+        app:markerSize="20dp" />
 
     <android.support.v7.widget.CardView
+        android:id="@+id/route_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
+        android:layout_gravity="center_vertical"
         android:layout_marginBottom="15dp"
         android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_gravity="center_vertical"
-        android:id="@+id/route_card"
+        android:layout_marginTop="15dp"
         app:cardElevation="1dp"
         app:contentPadding="15dp">
 
@@ -38,21 +37,31 @@
             android:orientation="vertical">
 
             <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/route_date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/route_date"
                 android:textSize="12sp"
-                tools:text="24 JAN"/>
+                tools:text="24 JAN" />
 
             <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/route_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:id="@+id/route_name"
                 android:textColor="@android:color/black"
-                tools:text="Order Successfully Completed"/>
+                tools:text="Order Successfully Completed" />
 
         </LinearLayout>
+
+        <ImageView
+            android:id="@+id/route_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:alpha="0.26"
+            app:srcCompat="@drawable/ic_delete_black_24dp"
+            tools:ignore="VectorDrawableCompat" />
+
 
     </android.support.v7.widget.CardView>
 

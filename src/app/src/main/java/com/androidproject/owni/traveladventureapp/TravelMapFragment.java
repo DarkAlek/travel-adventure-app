@@ -75,29 +75,33 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    private void loadAllPointsToMap() {
-        RealmQuery query = realm.where(DBLocation.class);
-        RealmResults<DBLocation> results = query.findAll();
-
-        realm.beginTransaction();
-        for (int i = 0; i < results.size(); i++) {
-            DBLocation location = results.get(i);
-
-            Location aLocation = new Location("");
-            aLocation.setLongitude(location.getGeoWidth());
-            aLocation.setLatitude(location.getGeoHeight());
-
-            addPointToMap(aLocation);
-            mLastLocation = aLocation;
-        }
-        realm.commitTransaction();
-
-        centerAtLocation(mLastLocation);
-    }
+//    private void loadAllPointsToMap() {
+//        RealmQuery query = realm.where(DBLocation.class);
+//        RealmResults<DBLocation> results = query.findAll();
+//
+//        realm.beginTransaction();
+//        for (int i = 0; i < results.size(); i++) {
+//            DBLocation location = results.get(i);
+//
+//            Location aLocation = new Location("");
+//            aLocation.setLongitude(location.getGeoWidth());
+//            aLocation.setLatitude(location.getGeoHeight());
+//
+//            addPointToMap(aLocation);
+//            mLastLocation = aLocation;
+//        }
+//        realm.commitTransaction();
+//
+//        centerAtLocation(mLastLocation);
+//    }
 
     private void loadCurrentRoute() {
 
         DBRoute route = realm.where(DBRoute.class).equalTo("id", routeID).findFirst();
+        if(route == null){
+            mGoogleMap.clear();
+            return;
+        }
         RealmList<DBLocation> routePoints = route.getRoute();
 
         for (int i = 0; i < routePoints.size(); i++) {
@@ -255,7 +259,6 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
         if(routeID != null) {
             loadCurrentRoute();
         }
-        else loadAllPointsToMap();
     }
 
     @Override
