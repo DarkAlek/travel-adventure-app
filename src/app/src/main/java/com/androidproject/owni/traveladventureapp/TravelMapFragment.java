@@ -145,10 +145,6 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
         }
 
         loadInfoValues();
-            addPointToMap(aLocation);
-            mLastLocation = aLocation;
-        }
-
         mGoogleMap.addPolyline(line);
         centerAtLocation(mLastLocation);
     }
