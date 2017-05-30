@@ -345,6 +345,9 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
         if (mins > 0)
             time_elapsed_str += mins + " min";
 
+        if (time_elapsed_str.isEmpty())
+            time_elapsed_str = "Just started";
+
         time_elapsed.setText(time_elapsed_str);
     }
 }
