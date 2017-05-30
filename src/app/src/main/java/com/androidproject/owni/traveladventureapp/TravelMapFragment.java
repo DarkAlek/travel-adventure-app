@@ -54,6 +54,11 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
                 case ProbeLocalizationService.MSG_LOCALIZATION:
                     // Updating map current location on message from background service
                     Location location = (Location) msg.obj;
+                    
+                    DBRoute dbRoute = realm.where(DBRoute.class).equalTo("id", routeID).findFirst();
+
+                    if (dbRoute.getIsRunning() == Boolean.FALSE)
+                        break;
 
                     if (mLastLocation == null) {
                         centerAtLocation(location);
