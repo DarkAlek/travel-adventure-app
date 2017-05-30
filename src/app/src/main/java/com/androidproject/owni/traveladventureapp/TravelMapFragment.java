@@ -30,7 +30,12 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
@@ -49,6 +54,7 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
     boolean mIsBound;
     String routeID;
     double currentDistance = 0.0;
+    double currentHighestAltitude = Double.MIN_VALUE;
     private View rootView;
     final Messenger mMessenger = new Messenger(new IncomingHandler());
 
@@ -106,6 +112,11 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
                 Location.distanceBetween(aLocation.getLatitude(), aLocation.getLongitude(), mLastLocation.getLatitude(), mLastLocation.getLongitude(), results);
                 currentDistance += results[0];
             }
+
+            double altitude = location.getAltitude();
+
+            if (altitude != Double.NaN)
+                currentHighestAltitude = Math.max(altitude, currentHighestAltitude);
 
             addPointToMap(aLocation);
             mLastLocation = aLocation;
@@ -270,7 +281,36 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
 
     public void loadInfoValues(){
         TextView distanceView = (TextView) getView().findViewById(R.id.distance_textview);
-        distanceView.setText(Double.toString(currentDistance) + "km");
-        distanceView.setText("KUTAS");
+
+        String distanceShowed = new DecimalFormat("#.#").format(currentDistance/1000);
+        distanceView.setText(distanceShowed + "km");
+
+        String highestShowed = new DecimalFormat("#.##").format(currentHighestAltitude);
+        TextView altitudeView = (TextView) getView().findViewById(R.id.highest_textview);
+        altitudeView.setText(highestShowed + "m");
+
+        DBRoute dbRoute = realm.where(DBRoute.class).equalTo("id", routeID).findFirst();
+        DateFormat sdf = new SimpleDateFormat("dd MMM, yyyy", Locale.ENGLISH);
+        Date netDate = (new Date(dbRoute.getTimestamp()));
+
+        TextView date_start = (TextView) getView().findViewById(R.id.date_start_textview);
+        date_start.setText(sdf.format(netDate));
+
+        long diff = (new Date().getTime() - netDate.getTime())/1000;
+        long days = diff/(3600*24);
+        long hours = (diff - days*3600*24)/3600;
+        long mins = (diff - days*24*3600 - hours*3600)/60;
+
+        TextView time_elapsed = (TextView) getView().findViewById(R.id.time_elapsed_textview);
+        String time_elapsed_str = "";
+
+        if (days > 0)
+            time_elapsed_str += days + " days ";
+        if (hours > 0)
+            time_elapsed_str += hours + " hours ";
+        if (mins > 0)
+            time_elapsed_str += mins + " min";
+
+        time_elapsed.setText(time_elapsed_str);
     }
 }
