@@ -54,8 +54,8 @@ public class LocalizationManager {
             Long timestamp = System.currentTimeMillis() / 1000;
             DBLocation dbLocation = new DBLocation();
             dbLocation.setId(timestamp);
-            dbLocation.setGeoWidth(location.getLongitude());
-            dbLocation.setGeoHeight(location.getLatitude());
+            dbLocation.setGeoWidth(location.getLatitude());
+            dbLocation.setGeoHeight(location.getLongitude());
             dbLocation.setTimestamp(timestamp);
             dbRoute.getRoute().add(dbLocation);
             realm.insertOrUpdate(dbLocation);

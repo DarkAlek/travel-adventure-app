@@ -30,13 +30,10 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
 
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
-
     private DBRoute activeRoute;
-
     public DBRoute getActiveRoute() {
         return activeRoute;
     }
-
     public void setActiveRoute(DBRoute activeRoute) {
         this.activeRoute = activeRoute;
     }
@@ -68,12 +65,15 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
         initNavigationView();
 
         if(getIntent().hasExtra("ROUTES_ID")) {
-
             Bundle args = new Bundle();
             args.putString("ROUTES_ID", getIntent().getExtras().getString("ROUTES_ID"));
             mapFragment.setArguments(args);
         }
-
+        else if (activeRoute != null){
+            Bundle args = new Bundle();
+            args.putString("ROUTES_ID", activeRoute.getId());
+            mapFragment.setArguments(args);
+        }
     }
 
     public void askAboutLocalizationPermissions() {

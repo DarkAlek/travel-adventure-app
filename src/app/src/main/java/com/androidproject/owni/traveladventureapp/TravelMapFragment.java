@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.androidproject.owni.traveladventureapp.database.DBLocation;
 import com.androidproject.owni.traveladventureapp.database.DBRoute;
@@ -28,6 +29,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+
+import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
@@ -45,6 +48,8 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
     Realm realm;
     boolean mIsBound;
     String routeID;
+    double currentDistance = 0.0;
+    private View rootView;
     final Messenger mMessenger = new Messenger(new IncomingHandler());
 
     class IncomingHandler extends Handler {
@@ -54,10 +59,10 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
                 case ProbeLocalizationService.MSG_LOCALIZATION:
                     // Updating map current location on message from background service
                     Location location = (Location) msg.obj;
-                    
+
                     DBRoute dbRoute = realm.where(DBRoute.class).equalTo("id", routeID).findFirst();
 
-                    if (dbRoute.getIsRunning() == Boolean.FALSE)
+                    if (dbRoute != null && dbRoute.getIsRunning() == Boolean.FALSE)
                         break;
 
                     if (mLastLocation == null) {
@@ -79,26 +84,6 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-//    private void loadAllPointsToMap() {
-//        RealmQuery query = realm.where(DBLocation.class);
-//        RealmResults<DBLocation> results = query.findAll();
-//
-//        realm.beginTransaction();
-//        for (int i = 0; i < results.size(); i++) {
-//            DBLocation location = results.get(i);
-//
-//            Location aLocation = new Location("");
-//            aLocation.setLongitude(location.getGeoWidth());
-//            aLocation.setLatitude(location.getGeoHeight());
-//
-//            addPointToMap(aLocation);
-//            mLastLocation = aLocation;
-//        }
-//        realm.commitTransaction();
-//
-//        centerAtLocation(mLastLocation);
-//    }
-
     private void loadCurrentRoute() {
 
         DBRoute route = realm.where(DBRoute.class).equalTo("id", routeID).findFirst();
@@ -106,21 +91,28 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
             mGoogleMap.clear();
             return;
         }
-        RealmList<DBLocation> routePoints = route.getRoute();
+        RealmResults<DBLocation> routePoints = route.getRoute().sort("timestamp");
 
         for (int i = 0; i < routePoints.size(); i++) {
             DBLocation location = routePoints.get(i);
 
             Location aLocation = new Location("");
-            aLocation.setLongitude(location.getGeoWidth());
-            aLocation.setLatitude(location.getGeoHeight());
+            aLocation.setLongitude(location.getGeoHeight());
+            aLocation.setLatitude(location.getGeoWidth());
+
+            float[] results = new float[1];
+
+            if (mLastLocation != null) {
+                Location.distanceBetween(aLocation.getLatitude(), aLocation.getLongitude(), mLastLocation.getLatitude(), mLastLocation.getLongitude(), results);
+                currentDistance += results[0];
+            }
 
             addPointToMap(aLocation);
             mLastLocation = aLocation;
         }
 
+        loadInfoValues();
         centerAtLocation(mLastLocation);
-
     }
 
     private void centerAtLocation(Location location) {
@@ -218,7 +210,8 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.activity_main,null);
+        rootView = inflater.inflate(R.layout.activity_main, container, false);
+        return rootView;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -262,6 +255,7 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
         //loadAllPointsToMap();
         if(routeID != null) {
             loadCurrentRoute();
+            loadInfoValues();
         }
     }
 
@@ -270,5 +264,13 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
         super.onResume();
         SupportMapFragment smf = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map));
         smf.getMapAsync(this);
+
+        loadInfoValues();
+    }
+
+    public void loadInfoValues(){
+        TextView distanceView = (TextView) getView().findViewById(R.id.distance_textview);
+        distanceView.setText(Double.toString(currentDistance) + "km");
+        distanceView.setText("KUTAS");
     }
 }
