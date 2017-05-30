@@ -19,13 +19,16 @@ public class RouteViewHolder extends RecyclerView.ViewHolder {
     TimelineView routeMarker;
     TextView routeName;
     TextView routeDate;
+    ImageView routeDelete;
 
-    public RouteViewHolder(View itemView, int viewType, CardView routeCard, TimelineView routeMarker, TextView routeName, TextView routeDate) {
+
+    public RouteViewHolder(View itemView, int viewType, CardView routeCard, TimelineView routeMarker, TextView routeName, TextView routeDate, ImageView routeDelete) {
         super(itemView);
         this.routeCard = routeCard;
         this.routeMarker = routeMarker;
         this.routeMarker.initLine(viewType);
         this.routeName = routeName;
         this.routeDate = routeDate;
+        this.routeDelete = routeDelete;
     }
 }

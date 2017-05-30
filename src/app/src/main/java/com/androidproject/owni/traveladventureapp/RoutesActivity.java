@@ -1,13 +1,25 @@
 package com.androidproject.owni.traveladventureapp;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.drawable.Drawable;
+import android.support.annotation.IntRange;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -43,11 +55,14 @@ public class RoutesActivity extends AppCompatActivity {
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View v = getLayoutInflater().inflate(R.layout.route_item, parent, false);
             //View v = View.inflate(parent.getContext(), R.layout.route_item, null);
+            //View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.route_item, parent, false);
+
             return new RouteViewHolder(v, viewType,
                     (CardView) v.findViewById(R.id.route_card),
                     (TimelineView) v.findViewById(R.id.route_marker),
                     (TextView)v.findViewById(R.id.route_name),
-                    (TextView) v.findViewById(R.id.route_date)
+                    (TextView) v.findViewById(R.id.route_date),
+                    (ImageView) v.findViewById(R.id.route_delete)
             );
         }
 
@@ -56,7 +71,6 @@ public class RoutesActivity extends AppCompatActivity {
             final DBRoute currentItem = dataSet.get(position);
             RouteViewHolder h = (RouteViewHolder)holder;
             h.routeName.setText(currentItem.getName());
-
             SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy, HH:mm");
             Date resultDate = new Date(currentItem.getTimestamp());
             h.routeDate.setText(sdf.format(resultDate));
@@ -67,14 +81,38 @@ public class RoutesActivity extends AppCompatActivity {
                     Intent intent = new Intent(RoutesActivity.this, MainActivity.class);
                     intent.putExtra("ROUTES_ID", currentItem.getId());
                     startActivity(intent);
-
-                    //realm.beginTransaction();
-                    //currentItem.setTimestamp(System.currentTimeMillis());
-                    //realm.commitTransaction();
-                    //initializeDataSet();
-                    //routesItemsAdapter.notifyDataSetChanged();
                 }
             });
+            if(currentItem.getIsRunning() == false) {
+                h.routeDelete.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(RoutesActivity.this);
+                        builder.setMessage("Are you sure to delete?");
+                        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                realm.beginTransaction();
+                                currentItem.deleteFromRealm();
+                                realm.commitTransaction();
+                                initializeDataSet();
+                                routesItemsAdapter.notifyDataSetChanged();
+                            }
+                        });
+                        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                // User cancelled the dialog
+                            }
+                        });
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
+                    }
+                });
+            }
+            else  h.routeDelete.setColorFilter(Color.WHITE);
+            if(currentItem.getIsRunning() == true) {
+                h.routeMarker.setMarker(getResources().getDrawable(R.drawable.marker_active));
+            }
         }
 
         @Override
@@ -88,13 +126,9 @@ public class RoutesActivity extends AppCompatActivity {
         }
     };
 
-
     private void initializeDataSet() {
 
         dataSet = new ArrayList<>();
-//        realm.beginTransaction();
-//        realm.deleteAll();
-//        realm.commitTransaction();
         RealmResults<DBRoute>  routeResults = realm.where(DBRoute.class).findAllSorted("timestamp", Sort.DESCENDING);
         for(DBRoute item:routeResults) dataSet.add(item);
     }

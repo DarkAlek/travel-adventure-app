@@ -13,6 +13,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
+import android.view.Menu;
 import android.view.MenuItem;
 
 import com.androidproject.owni.traveladventureapp.database.DBLocation;
@@ -30,6 +31,16 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
 
+    private DBRoute activeRoute;
+
+    public DBRoute getActiveRoute() {
+        return activeRoute;
+    }
+
+    public void setActiveRoute(DBRoute activeRoute) {
+        this.activeRoute = activeRoute;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +57,13 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
 
         fragmentTransaction.add(R.id.map, mapFragment);
         fragmentTransaction.commit();
+
+        DatabaseManager db = new DatabaseManager(getApplicationContext());
+        final Realm realm = db.getRealmObject();
+
+        RealmQuery<DBRoute> query = realm.where(DBRoute.class);
+        query.equalTo("isRunning", Boolean.TRUE);
+        activeRoute = query.findFirst();
 
         initNavigationView();
 
@@ -91,29 +109,29 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
                 return false;
             }
         });
+
+        Menu nav_Menu = navigationView.getMenu();
+        if(activeRoute == null) nav_Menu.findItem(R.id.current_travel).setEnabled(false);
+        else nav_Menu.findItem(R.id.current_travel).setEnabled(true);
     }
+
 
     public void startNewTravelDialog() {
         DatabaseManager db = new DatabaseManager(getApplicationContext());
         final Realm realm = db.getRealmObject();
 
-        realm.beginTransaction();
-        RealmQuery<DBRoute> query = realm.where(DBRoute.class);
-        query.equalTo("isRunning", Boolean.TRUE);
-        final DBRoute dbRoute = query.findFirst();
-        realm.commitTransaction();
-
-        if (dbRoute != null)
+        if (activeRoute != null)
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
             builder.setMessage("Do You want to stop current trip?");
             builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     realm.beginTransaction();
-                    dbRoute.setIsRunning(Boolean.FALSE);
+                    activeRoute.setIsRunning(Boolean.FALSE);
                     //realm.copyToRealmOrUpdate(dbRoute);
                     realm.commitTransaction();
-
+                    activeRoute = null;
+                    if(activeRoute == null) navigationView.getMenu().findItem(R.id.current_travel).setEnabled(false);
                     showAddNewTravelDialog();
                 }
             });
@@ -129,7 +147,6 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
             showAddNewTravelDialog();
 
     }
-
     public void showAddNewTravelDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setMessage("Insert name of new trip:");
@@ -158,8 +175,10 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
         dbRoute.setTimestamp(System.currentTimeMillis());
         dbRoute.setName(travelName);
         dbRoute.setIsRunning(Boolean.TRUE);
-        realm.insert(dbRoute);
+        realm.insertOrUpdate(dbRoute);
+        activeRoute = dbRoute;
         realm.commitTransaction();
+        if(activeRoute != null) navigationView.getMenu().findItem(R.id.current_travel).setEnabled(true);
 
     }
 
@@ -173,6 +192,11 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
 
         fragmentTransaction.add(R.id.map, mapFragment);
         fragmentTransaction.commit();
+
+        if(activeRoute == null) return;
+        Bundle args = new Bundle();
+        args.putString("ROUTES_ID", activeRoute.getId());
+        mapFragment.setArguments(args);
     }
 
     public void showTravelList() {
