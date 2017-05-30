@@ -28,6 +28,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
@@ -65,7 +67,16 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
                                 new LatLng(location.getLatitude(), location.getLongitude())));
                     }
 
-                    addPointToMap(location);
+                    //addPointToMap(location);
+                    addCurrentPositionToMap(location);
+                    if(mLastLocation == null) return;
+                    PolylineOptions line = new PolylineOptions();
+                    line.color(Color.BLUE);
+                    line.width(10);
+                    line.visible(true);
+                    line.add(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+                    line.add(new LatLng(location.getLatitude(), location.getLongitude()));
+                    mGoogleMap.addPolyline(line);
                     mLastLocation = location;
 
                     break;
@@ -103,18 +114,21 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
             return;
         }
         RealmList<DBLocation> routePoints = route.getRoute();
-
+        PolylineOptions line = new PolylineOptions();
+        line.color(Color.BLUE);
+        line.width(5);
+        line.visible(true);
         for (int i = 0; i < routePoints.size(); i++) {
             DBLocation location = routePoints.get(i);
 
             Location aLocation = new Location("");
-            aLocation.setLongitude(location.getGeoWidth());
-            aLocation.setLatitude(location.getGeoHeight());
-
+            aLocation.setLongitude(location.getGeoHeight());
+            aLocation.setLatitude(location.getGeoWidth());
+            line.add(new LatLng(location.getGeoWidth(), location.getGeoHeight()));
             addPointToMap(aLocation);
             mLastLocation = aLocation;
         }
-
+        mGoogleMap.addPolyline(line);
         centerAtLocation(mLastLocation);
 
     }
@@ -128,6 +142,17 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
     private void addPointToMap(Location location) {
         mGoogleMap.addCircle(new CircleOptions().center(new LatLng(location.getLatitude(), location.getLongitude())).radius(3).fillColor(Color.BLUE).strokeColor(Color.BLUE));
     }
+
+    private void addCurrentPositionToMap(Location location) {
+        //mGoogleMap.addCircle(new CircleOptions().center(new LatLng(location.getLatitude(), location.getLongitude())).radius(3).fillColor(Color.BLUE).strokeColor(Color.BLUE));
+        LatLng currentPosition = new LatLng(location.getLatitude(), location.getLongitude());
+
+        mGoogleMap.addMarker(new MarkerOptions()
+                .title("Current position")
+                .snippet("Your sync position during travel.")
+                .position(currentPosition));
+    }
+
 
     private ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className,
