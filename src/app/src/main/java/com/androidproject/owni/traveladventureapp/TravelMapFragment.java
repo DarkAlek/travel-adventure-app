@@ -28,6 +28,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
@@ -44,6 +45,7 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
     OnFragmentInteractionListener mListener;
     GoogleMap mGoogleMap = null;
     Location mLastLocation = null;
+    Marker currentMarker = null;
     Messenger mService = null;
     Realm realm;
     boolean mIsBound;
@@ -67,8 +69,11 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
                                 new LatLng(location.getLatitude(), location.getLongitude())));
                     }
 
-                    //addPointToMap(location);
-                    addCurrentPositionToMap(location);
+                    if(currentMarker != null) {
+                        currentMarker.remove();
+                    }
+                    addPointToMap(location);
+                    currentMarker = addCurrentPositionToMap(location);
                     if(mLastLocation == null) return;
                     PolylineOptions line = new PolylineOptions();
                     line.color(Color.BLUE);
@@ -143,11 +148,11 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
         mGoogleMap.addCircle(new CircleOptions().center(new LatLng(location.getLatitude(), location.getLongitude())).radius(3).fillColor(Color.BLUE).strokeColor(Color.BLUE));
     }
 
-    private void addCurrentPositionToMap(Location location) {
+    private Marker addCurrentPositionToMap(Location location) {
         //mGoogleMap.addCircle(new CircleOptions().center(new LatLng(location.getLatitude(), location.getLongitude())).radius(3).fillColor(Color.BLUE).strokeColor(Color.BLUE));
         LatLng currentPosition = new LatLng(location.getLatitude(), location.getLongitude());
 
-        mGoogleMap.addMarker(new MarkerOptions()
+        return mGoogleMap.addMarker(new MarkerOptions()
                 .title("Current position")
                 .snippet("Your sync position during travel.")
                 .position(currentPosition));
