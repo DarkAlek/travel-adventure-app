@@ -106,8 +106,8 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
         if (dbRoute != null)
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-            builder.setMessage("fire missiles?");
-            builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
+            builder.setMessage("Do You want to stop current trip?");
+            builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     realm.beginTransaction();
                     dbRoute.setIsRunning(Boolean.FALSE);
@@ -117,7 +117,7 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
                     showAddNewTravelDialog();
                 }
             });
-            builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+            builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     // User cancelled the dialog
                 }
@@ -132,17 +132,18 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
 
     public void showAddNewTravelDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-        builder.setMessage("fire missiles2?");
+        builder.setMessage("Insert name of new trip:");
         final EditText input = new EditText(this);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         builder.setView(input);
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 addNewTravel(input.getText().toString());
             }
         });
         AlertDialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(false);
         dialog.show();
     }
 
