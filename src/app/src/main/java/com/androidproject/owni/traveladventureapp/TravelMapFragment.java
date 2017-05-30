@@ -29,6 +29,9 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -49,6 +52,7 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
     OnFragmentInteractionListener mListener;
     GoogleMap mGoogleMap = null;
     Location mLastLocation = null;
+    Marker currentMarker = null;
     Messenger mService = null;
     Realm realm;
     boolean mIsBound;
@@ -80,7 +84,19 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
                                 new LatLng(location.getLatitude(), location.getLongitude())));
                     }
 
+                    if(currentMarker != null) {
+                        currentMarker.remove();
+                    }
                     addPointToMap(location);
+                    currentMarker = addCurrentPositionToMap(location);
+                    if(mLastLocation == null) return;
+                    PolylineOptions line = new PolylineOptions();
+                    line.color(Color.BLUE);
+                    line.width(10);
+                    line.visible(true);
+                    line.add(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+                    line.add(new LatLng(location.getLatitude(), location.getLongitude()));
+                    mGoogleMap.addPolyline(line);
                     mLastLocation = location;
 
                     break;
@@ -98,6 +114,11 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
             return;
         }
         RealmResults<DBLocation> routePoints = route.getRoute().sort("timestamp");
+
+        PolylineOptions line = new PolylineOptions();
+        line.color(Color.BLUE);
+        line.width(5);
+        line.visible(true);
 
         for (int i = 0; i < routePoints.size(); i++) {
             DBLocation location = routePoints.get(i);
@@ -118,11 +139,17 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
             if (altitude != Double.NaN)
                 currentHighestAltitude = Math.max(altitude, currentHighestAltitude);
 
+            line.add(new LatLng(location.getGeoWidth(), location.getGeoHeight()));
             addPointToMap(aLocation);
             mLastLocation = aLocation;
         }
 
         loadInfoValues();
+            addPointToMap(aLocation);
+            mLastLocation = aLocation;
+        }
+
+        mGoogleMap.addPolyline(line);
         centerAtLocation(mLastLocation);
     }
 
@@ -135,6 +162,17 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
     private void addPointToMap(Location location) {
         mGoogleMap.addCircle(new CircleOptions().center(new LatLng(location.getLatitude(), location.getLongitude())).radius(3).fillColor(Color.BLUE).strokeColor(Color.BLUE));
     }
+
+    private Marker addCurrentPositionToMap(Location location) {
+        //mGoogleMap.addCircle(new CircleOptions().center(new LatLng(location.getLatitude(), location.getLongitude())).radius(3).fillColor(Color.BLUE).strokeColor(Color.BLUE));
+        LatLng currentPosition = new LatLng(location.getLatitude(), location.getLongitude());
+
+        return mGoogleMap.addMarker(new MarkerOptions()
+                .title("Current position")
+                .snippet("Your sync position during travel.")
+                .position(currentPosition));
+    }
+
 
     private ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className,
