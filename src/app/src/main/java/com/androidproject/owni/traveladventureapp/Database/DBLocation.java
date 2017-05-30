@@ -14,6 +14,7 @@ public class DBLocation extends RealmObject{
 
     private double geoWidth;
     private double geoHeight;
+    private double altitude;
 
     private long timestamp;
 
@@ -39,6 +40,14 @@ public class DBLocation extends RealmObject{
 
     public void setGeoHeight(double geoHeight) {
         this.geoHeight = geoHeight;
+    }
+
+    public double getAltitude() {
+        return altitude;
+    }
+
+    public void setAltitude(double altitude) {
+        this.altitude = altitude;
     }
 
     public long getTimestamp() {
