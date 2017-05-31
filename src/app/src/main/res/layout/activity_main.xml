@@ -88,6 +88,7 @@
                     android:textSize="19dp"
                     android:layout_marginTop="5dp"
                     android:layout_alignParentRight="true"
+                    android:textAlignment="center"
                     />
                 <TextView
                     android:id="@+id/date_start_help"

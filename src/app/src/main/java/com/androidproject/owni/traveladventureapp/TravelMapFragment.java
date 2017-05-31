@@ -343,6 +343,7 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
         DateFormat sdf = new SimpleDateFormat("dd MMM, yyyy", Locale.ENGLISH);
         Date netDate = (new Date(dbRoute.getTimestamp()));
 
+        // TODO
         Date end_date = new Date(dbRoute.getRoute().sort("id").last().getTimestamp()*1000);
         date_start.setText(sdf.format(netDate));
 

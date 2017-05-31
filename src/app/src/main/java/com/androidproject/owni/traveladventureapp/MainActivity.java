@@ -91,7 +91,6 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 int id = menuItem.getItemId();
-                menuItem.setChecked(true);
                 switch (id) {
                     case R.id.start_travel:
                         startNewTravelDialog();
@@ -123,7 +122,7 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
         if (activeRoute != null)
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-            builder.setMessage("Do You want to stop current trip?");
+            builder.setMessage("Do you want to stop current trip?");
             builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     realm.beginTransaction();
@@ -204,7 +203,8 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
         // show travel list
         Intent i = new Intent(MainActivity.this, RoutesActivity.class);
         i.putExtra("TITLE", "Routes");
-        startActivityForResult(i, 1);
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(i);
     }
 
     @Override
