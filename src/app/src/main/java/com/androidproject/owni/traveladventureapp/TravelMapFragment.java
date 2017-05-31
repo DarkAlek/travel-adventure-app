@@ -39,6 +39,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
@@ -73,6 +75,9 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
                     DBRoute dbRoute = realm.where(DBRoute.class).equalTo("id", routeID).findFirst();
 
                     if (dbRoute != null && dbRoute.getIsRunning() == Boolean.FALSE)
+                        break;
+
+                    if (dbRoute.getRoute().where().equalTo("geoWidth", location.getLatitude()).equalTo("geoHeight", location.getLongitude()) == null)
                         break;
 
                     if (mLastLocation == null) {
@@ -315,35 +320,45 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
 
     public void loadInfoValues(){
         TextView distanceView = (TextView) getView().findViewById(R.id.distance_textview);
+        TextView date_start = (TextView) getView().findViewById(R.id.date_start_textview);
+        TextView altitudeView = (TextView) getView().findViewById(R.id.highest_textview);
+        TextView time_elapsed = (TextView) getView().findViewById(R.id.time_elapsed_textview);
+        DBRoute dbRoute = realm.where(DBRoute.class).equalTo("id", routeID).findFirst();
+
+        if (dbRoute == null) {
+            distanceView.setText("-");
+            date_start.setText("-");
+            altitudeView.setText("-");
+            time_elapsed.setText("-");
+
+            return;
+        }
 
         String distanceShowed = new DecimalFormat("#.#").format(currentDistance/1000);
         distanceView.setText(distanceShowed + "km");
 
         String highestShowed = new DecimalFormat("#.##").format(currentHighestAltitude);
-        TextView altitudeView = (TextView) getView().findViewById(R.id.highest_textview);
         altitudeView.setText(highestShowed + "m");
 
-        DBRoute dbRoute = realm.where(DBRoute.class).equalTo("id", routeID).findFirst();
         DateFormat sdf = new SimpleDateFormat("dd MMM, yyyy", Locale.ENGLISH);
         Date netDate = (new Date(dbRoute.getTimestamp()));
 
-        TextView date_start = (TextView) getView().findViewById(R.id.date_start_textview);
+        Date end_date = new Date(dbRoute.getRoute().sort("id").last().getTimestamp()*1000);
         date_start.setText(sdf.format(netDate));
 
-        long diff = (new Date().getTime() - netDate.getTime())/1000;
+        long diff = (end_date.getTime() - netDate.getTime())/1000;
         long days = diff/(3600*24);
         long hours = (diff - days*3600*24)/3600;
         long mins = (diff - days*24*3600 - hours*3600)/60;
 
-        TextView time_elapsed = (TextView) getView().findViewById(R.id.time_elapsed_textview);
         String time_elapsed_str = "";
 
         if (days > 0)
             time_elapsed_str += days + " days ";
         if (hours > 0)
-            time_elapsed_str += hours + " hours ";
+            time_elapsed_str += hours + " h ";
         if (mins > 0)
-            time_elapsed_str += mins + " min";
+            time_elapsed_str += mins + " m";
 
         if (time_elapsed_str.isEmpty())
             time_elapsed_str = "Just started";

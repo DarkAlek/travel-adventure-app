@@ -63,9 +63,11 @@ public class LocalizationManager {
             realm.commitTransaction();
 
             updateAltitude(dbLocation);
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     private double updateAltitude(final DBLocation location) {
