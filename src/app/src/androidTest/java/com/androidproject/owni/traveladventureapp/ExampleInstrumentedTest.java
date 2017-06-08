@@ -2,6 +2,7 @@ package com.androidproject.owni.traveladventureapp;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.annotation.UiThreadTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -36,11 +37,10 @@ public class ExampleInstrumentedTest {
 
     @Rule
     public ActivityTestRule<MainActivity> rule  = new  ActivityTestRule<>(MainActivity.class);
-
     @Test
+    @UiThreadTest
     public void enterRouteName() throws Exception {
 
-        // works only without editing NavigationView in addNewTravel()
         MainActivity mainActivity = rule.getActivity();
         mainActivity.addNewTravel("TestRoute");
         DatabaseManager database = new DatabaseManager(InstrumentationRegistry.getTargetContext());
