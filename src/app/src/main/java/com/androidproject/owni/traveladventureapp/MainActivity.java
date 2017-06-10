@@ -39,12 +39,12 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
         this.activeRoute = activeRoute;
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        askAboutLocalizationPermissions();
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            askAboutLocalizationPermissions();
 
-        ProbeLocalizationService.startServiceProbing(this);
+            ProbeLocalizationService.startServiceProbing(this);
 
         setContentView(R.layout.activity_main);
 
@@ -128,10 +128,10 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
                 public void onClick(DialogInterface dialog, int id) {
                     realm.beginTransaction();
                     activeRoute.setIsRunning(Boolean.FALSE);
-                    //realm.copyToRealmOrUpdate(dbRoute);
+                    realm.copyToRealmOrUpdate(activeRoute);
                     realm.commitTransaction();
                     activeRoute = null;
-                    if(activeRoute == null) navigationView.getMenu().findItem(R.id.current_travel).setEnabled(false);
+                    navigationView.getMenu().findItem(R.id.current_travel).setEnabled(false);
                     showAddNewTravelDialog();
                 }
             });
@@ -179,6 +179,14 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
     public void addNewTravel(String travelName){
         DatabaseManager db = new DatabaseManager(MainActivity.this);
         Realm realm = db.getRealmObject();
+
+        if(activeRoute != null){
+            realm.beginTransaction();
+            activeRoute.setIsRunning(Boolean.FALSE);
+            realm.commitTransaction();
+            activeRoute = null;
+            navigationView.getMenu().findItem(R.id.current_travel).setEnabled(false);
+        }
 
         realm.beginTransaction();
         Long timestamp = System.currentTimeMillis()/1000;
