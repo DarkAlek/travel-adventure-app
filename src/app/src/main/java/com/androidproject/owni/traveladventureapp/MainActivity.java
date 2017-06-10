@@ -24,6 +24,7 @@ import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
+import android.view.View;
 import android.widget.EditText;
 
 public class MainActivity extends FragmentActivity implements TravelMapFragment.OnFragmentInteractionListener {
@@ -154,13 +155,25 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
         builder.setView(input);
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                addNewTravel(input.getText().toString());
-            }
+            public void onClick(DialogInterface dialog, int which) { }
         });
-        AlertDialog dialog = builder.create();
+        final AlertDialog dialog = builder.create();
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                if(input.getText().toString().isEmpty()) {
+                    input.setError("Enter route name");
+                }
+                else {
+                    addNewTravel(input.getText().toString());
+                    dialog.dismiss();
+                }
+            }
+        });
     }
 
     public void addNewTravel(String travelName){
@@ -178,7 +191,6 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
         activeRoute = dbRoute;
         realm.commitTransaction();
         if(activeRoute != null) navigationView.getMenu().findItem(R.id.current_travel).setEnabled(true);
-
     }
 
     public void showCurrentTravel() {
