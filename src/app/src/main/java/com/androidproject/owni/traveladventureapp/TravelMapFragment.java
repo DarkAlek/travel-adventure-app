@@ -1,5 +1,7 @@
 package com.androidproject.owni.traveladventureapp;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v4.app.Fragment;
 import android.content.ComponentName;
 import android.content.Context;
@@ -21,12 +23,16 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.androidproject.owni.traveladventureapp.database.DBLocation;
+import com.androidproject.owni.traveladventureapp.database.DBPhoto;
 import com.androidproject.owni.traveladventureapp.database.DBRoute;
 
+import com.androidproject.owni.traveladventureapp.lib.ImageIconFactory;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -109,6 +115,21 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
                     super.handleMessage(msg);
             }
         }
+    }
+
+    public void showPhoto(DBPhoto dbPhoto) {
+        // TODO
+        // show photo on map, close to its location
+        BitmapDescriptor icon = ImageIconFactory.createIconForPhoto(dbPhoto);
+
+        LatLng myPoint = new LatLng(dbPhoto.getLocation().getGeoWidth(), dbPhoto.getLocation().getGeoHeight());
+        MarkerOptions marker = new MarkerOptions();
+        marker.position(myPoint);
+        marker.title("You");
+        marker.snippet("You are here.");
+
+        marker.icon(icon);
+        mGoogleMap.addMarker(marker);
     }
 
     private void loadCurrentRoute() {

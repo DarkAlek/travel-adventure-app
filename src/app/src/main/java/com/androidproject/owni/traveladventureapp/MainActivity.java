@@ -22,9 +22,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.androidproject.owni.traveladventureapp.database.DBLocation;
+import com.androidproject.owni.traveladventureapp.database.DBPhoto;
 import com.androidproject.owni.traveladventureapp.database.DBRoute;
 import com.androidproject.owni.traveladventureapp.lib.DatabaseManager;
 import com.androidproject.owni.traveladventureapp.lib.PhotosManager;
+import com.google.android.gms.maps.MapFragment;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
@@ -39,10 +41,13 @@ import java.io.IOException;
 
 public class MainActivity extends FragmentActivity implements TravelMapFragment.OnFragmentInteractionListener {
     static final int REQUEST_TAKE_PHOTO = 1;
+    static final int REQUEST_IMAGE_CAPTURE = 1;
 
+    private String mLastPhotoPath;
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
     private DBRoute activeRoute;
+    private TravelMapFragment mapFragment;
     public DBRoute getActiveRoute() {
         return activeRoute;
     }
@@ -59,7 +64,7 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
 
         setContentView(R.layout.activity_main);
 
-        TravelMapFragment mapFragment = new TravelMapFragment();
+        mapFragment = new TravelMapFragment();
         //mapFragment.setArguments(args);
         android.support.v4.app.FragmentTransaction fragmentTransaction =
                 getSupportFragmentManager().beginTransaction();
@@ -234,7 +239,7 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             // Create the File where the photo should go
             File photoFile = null;
-            PhotosManager photos = new PhotosManager(getFilesDir());
+            PhotosManager photos = new PhotosManager(getExternalFilesDir(Environment.DIRECTORY_PICTURES));
             try {
                 photoFile = photos.createImageFile();
             } catch (IOException ex) {
@@ -246,32 +251,34 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
                         "com.example.android.fileprovider",
                         photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                mLastPhotoPath = photoFile.getAbsolutePath();
                 startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
             }
         }
     }
 
-    /*
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            DatabaseManager db = new DatabaseManager(getApplicationContext());
+            final Realm realm = db.getRealmObject();
 
-            PhotosManager files = new PhotosManager(getFilesDir());
-            try {
-                files.createImageFile();
-            }
-            catch (IOException){
+            realm.beginTransaction();
+            Long timestamp = System.currentTimeMillis() / 1000;
+            DBPhoto dbPhoto = new DBPhoto();
+            dbPhoto.setId(timestamp);
+            dbPhoto.setTimestamp(timestamp);
+            dbPhoto.setRoute(activeRoute);
+            dbPhoto.setPath(mLastPhotoPath);
+            RealmResults<DBLocation> routePoints = activeRoute.getRoute().sort("timestamp");
+            DBLocation location = routePoints.last();
+            dbPhoto.setLocation(location);
+            realm.insertOrUpdate(dbPhoto);
+            realm.commitTransaction();
 
-            }
-
-            // TODO
-            // save bitmap in application data
-            // mImageView.setImageBitmap(imageBitmap);
+            mapFragment.showPhoto(dbPhoto);
         }
     }
-    */
 
     @Override
     public void onFragmentInteraction(Uri uri){
