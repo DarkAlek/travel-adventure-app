@@ -41,6 +41,35 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_marginTop="345dp"
+                >
+
+                <ImageButton
+                    android:id="@+id/click_photo"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@mipmap/ic_takephoto"
+                    android:padding="5dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="10dp"
+                    android:onClick="takePhoto"
+                    />
+
+                <ImageButton
+                    android:id="@+id/click_stop"
+                    android:layout_below="@+id/click_photo"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@mipmap/ic_stop"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="5dp"
+                />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:background="@color/cardview_light_background"
                 android:animateLayoutChanges="true"
                 android:paddingLeft="36dp"

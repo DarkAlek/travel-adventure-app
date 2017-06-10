@@ -4,12 +4,17 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.Contacts;
+import android.provider.MediaStore;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
@@ -19,6 +24,7 @@ import android.view.MenuItem;
 import com.androidproject.owni.traveladventureapp.database.DBLocation;
 import com.androidproject.owni.traveladventureapp.database.DBRoute;
 import com.androidproject.owni.traveladventureapp.lib.DatabaseManager;
+import com.androidproject.owni.traveladventureapp.lib.PhotosManager;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
@@ -27,7 +33,12 @@ import io.realm.RealmResults;
 import android.view.View;
 import android.widget.EditText;
 
+import java.io.File;
+import java.io.IOException;
+
+
 public class MainActivity extends FragmentActivity implements TravelMapFragment.OnFragmentInteractionListener {
+    static final int REQUEST_TAKE_PHOTO = 1;
 
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
@@ -211,13 +222,56 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
     }
 
     public void showTravelList() {
-        // TODO
-        // show travel list
         Intent i = new Intent(MainActivity.this, RoutesActivity.class);
         i.putExtra("TITLE", "Routes");
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(i);
     }
+
+    public void takePhoto(View view){
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            PhotosManager photos = new PhotosManager(getFilesDir());
+            try {
+                photoFile = photos.createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+
+            }
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this,
+                        "com.example.android.fileprovider",
+                        photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+            }
+        }
+    }
+
+    /*
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+
+            PhotosManager files = new PhotosManager(getFilesDir());
+            try {
+                files.createImageFile();
+            }
+            catch (IOException){
+
+            }
+
+            // TODO
+            // save bitmap in application data
+            // mImageView.setImageBitmap(imageBitmap);
+        }
+    }
+    */
 
     @Override
     public void onFragmentInteraction(Uri uri){
