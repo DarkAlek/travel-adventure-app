@@ -152,15 +152,9 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback, G
         {
             String path_to_image= mMarkers.get(marker);
 
-            // TODO
-            // HERE WORK PHOTOS
             Intent intent = new Intent();
             intent.setAction(Intent.ACTION_VIEW);
-
             File photoFile = new File(path_to_image);
-            //intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(photoFile));
-            //intent.setType("image/*");
-
             Uri photoUri = FileProvider.getUriForFile(
                     getContext().getApplicationContext(),
                     getContext().getApplicationContext().getPackageName() + ".fileprovider",
@@ -168,12 +162,7 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback, G
                     );
 
             intent.setDataAndType(photoUri, "image/*");
-            //intent.setDataAndType(Uri.parse("content:/" + path_to_image), "image/*");
-            //intent.setDataAndType(Uri.fromFile(new File(path_to_image)), "image/*");
-            //intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            //intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
-            //intent = new Intent(Intent.ACTION_GET_CONTENT);
             startActivity(intent);
         }
 
