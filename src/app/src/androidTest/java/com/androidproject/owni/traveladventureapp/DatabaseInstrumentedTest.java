@@ -32,7 +32,7 @@ public class DatabaseInstrumentedTest {
     public ActivityTestRule<MainActivity> rule  = new  ActivityTestRule<>(MainActivity.class);
     @Test
     @UiThreadTest
-    public void ensureRouteName() throws Exception {
+    public void ensureRouteNameIsPresent() throws Exception {
 
         MainActivity mainActivity = rule.getActivity();
         mainActivity.addNewTravel("TestRoute");

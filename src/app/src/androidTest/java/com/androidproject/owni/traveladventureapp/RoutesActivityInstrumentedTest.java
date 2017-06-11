@@ -51,14 +51,15 @@ public class RoutesActivityInstrumentedTest {
     @Test
     public void ensureListIsPresent() throws Exception {
 
-        RoutesActivity activity = ruleRA.getActivity();
-        View viewById = activity.findViewById(R.id.routes_items);
-        assertNotNull(viewById);
-        assertTrue(viewById instanceof RecyclerView);
-        RecyclerView recycler = (RecyclerView) viewById;
-        RecyclerView.Adapter adapter = recycler.getAdapter();
-        assertTrue(adapter.getItemCount() >= 1);
-    }
+    RoutesActivity activity = ruleRA.getActivity();
+    View viewById = activity.findViewById(R.id.routes_items);
+    assertNotNull(viewById);
+    assertTrue(viewById instanceof RecyclerView);
+    RecyclerView recycler = (RecyclerView) viewById;
+    RecyclerView.Adapter adapter = recycler.getAdapter();
+    assertNotNull(adapter);
+    assertTrue(adapter.getItemCount() >= 0);
+}
 
     @Test
     public void ensureIntentDataIsDisplayed()throws Exception {
