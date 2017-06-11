@@ -247,8 +247,9 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
 
             }
             if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(this,
-                        "com.example.android.fileprovider",
+                Uri photoURI = FileProvider.getUriForFile(
+                        getApplicationContext(),
+                        getApplicationContext().getPackageName() + ".fileprovider",
                         photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 mLastPhotoPath = photoFile.getAbsolutePath();

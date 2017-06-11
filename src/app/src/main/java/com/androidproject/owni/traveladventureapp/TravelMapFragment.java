@@ -17,6 +17,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -154,16 +155,23 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback, G
             // TODO
             // HERE WORK PHOTOS
             Intent intent = new Intent();
-            intent.setAction(Intent.ACTION_SEND);
+            intent.setAction(Intent.ACTION_VIEW);
 
             File photoFile = new File(path_to_image);
-            intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(photoFile));
-            intent.setType("image/*");
+            //intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(photoFile));
+            //intent.setType("image/*");
 
+            Uri photoUri = FileProvider.getUriForFile(
+                    getContext().getApplicationContext(),
+                    getContext().getApplicationContext().getPackageName() + ".fileprovider",
+                    photoFile
+                    );
+
+            intent.setDataAndType(photoUri, "image/*");
             //intent.setDataAndType(Uri.parse("content:/" + path_to_image), "image/*");
             //intent.setDataAndType(Uri.fromFile(new File(path_to_image)), "image/*");
             //intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
-            //intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             //intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
             //intent = new Intent(Intent.ACTION_GET_CONTENT);
             startActivity(intent);
