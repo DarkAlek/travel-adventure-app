@@ -84,7 +84,13 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback, G
                     // Updating map current location on message from background service
                     Location location = (Location) msg.obj;
 
+                    if(routeID == null)
+                        break;
+
                     DBRoute dbRoute = realm.where(DBRoute.class).equalTo("id", routeID).findFirst();
+
+                    if (dbRoute == null)
+                        break;
 
                     if (dbRoute != null && dbRoute.getIsRunning() == Boolean.FALSE)
                         break;
@@ -92,11 +98,9 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback, G
                     if (dbRoute.getRoute().where().equalTo("geoWidth", location.getLatitude()).equalTo("geoHeight", location.getLongitude()) == null)
                         break;
 
-                    /*
                     if (mLastLocation == null) {
                         centerAtLocation(location);
                     }
-                    */
 
                     /*
                     if (mLastLocation != null) {
@@ -119,6 +123,8 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback, G
                     line.add(new LatLng(location.getLatitude(), location.getLongitude()));
                     mGoogleMap.addPolyline(line);
                     mLastLocation = location;
+
+                    loadInfoValues();
 
                     break;
                 default:
@@ -482,6 +488,11 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback, G
                 time_elapsed_str = "Just started";
 
             time_elapsed.setText(time_elapsed_str);
+        }
+        else {
+            String time_elapsed_str = "Just started";
+            time_elapsed.setText(time_elapsed_str);
+            date_start.setText(sdf.format(netDate));
         }
     }
 }

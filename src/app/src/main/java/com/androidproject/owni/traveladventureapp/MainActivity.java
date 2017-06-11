@@ -147,6 +147,7 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
                     realm.copyToRealmOrUpdate(activeRoute);
                     realm.commitTransaction();
                     activeRoute = null;
+                    mapFragment.routeID = null;
                     navigationView.getMenu().findItem(R.id.current_travel).setEnabled(false);
                     showAddNewTravelDialog();
                 }
@@ -186,6 +187,15 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
                 }
                 else {
                     addNewTravel(input.getText().toString());
+                    TravelMapFragment mapFragment = new TravelMapFragment();
+                    android.support.v4.app.FragmentTransaction fragmentTransaction =
+                            getSupportFragmentManager().beginTransaction();
+                    fragmentTransaction.add(R.id.map, mapFragment);
+                    fragmentTransaction.commit();
+                    if(activeRoute == null) return;
+                    Bundle args = new Bundle();
+                    args.putString("ROUTES_ID", activeRoute.getId());
+                    mapFragment.setArguments(args);
                     dialog.dismiss();
                 }
             }
@@ -213,15 +223,13 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
         dbRoute.setIsRunning(Boolean.TRUE);
         realm.insertOrUpdate(dbRoute);
         activeRoute = dbRoute;
+        mapFragment.routeID = activeRoute.getId();
         realm.commitTransaction();
         if(activeRoute != null) navigationView.getMenu().findItem(R.id.current_travel).setEnabled(true);
     }
 
     public void showCurrentTravel() {
         TravelMapFragment mapFragment = new TravelMapFragment();
-        //mapFragment.setArguments(args);
-        //android.app.FragmentTransaction fragmentTransaction =
-        //        getFragmentManager().beginTransaction();
         android.support.v4.app.FragmentTransaction fragmentTransaction =
                 getSupportFragmentManager().beginTransaction();
 
