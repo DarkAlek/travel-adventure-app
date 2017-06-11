@@ -139,7 +139,7 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
         if (activeRoute != null)
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-            builder.setMessage("Do you want to stop current trip?");
+            builder.setMessage("Do you really want to finish current trip?");
             builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     realm.beginTransaction();
@@ -263,6 +263,36 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
                 mLastPhotoPath = photoFile.getAbsolutePath();
                 startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
             }
+        }
+    }
+
+    public void stopTravel(View view){
+        DatabaseManager db = new DatabaseManager(getApplicationContext());
+        final Realm realm = db.getRealmObject();
+
+        if (activeRoute != null)
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setMessage("Do you really want to finish current trip?");
+            builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    realm.beginTransaction();
+                    activeRoute.setIsRunning(Boolean.FALSE);
+                    realm.commitTransaction();
+                    activeRoute = null;
+                    if(activeRoute == null) navigationView.getMenu().findItem(R.id.current_travel).setEnabled(false);
+                    mapFragment.mGoogleMap.clear();
+                    mapFragment.routeID = null;
+                    mapFragment.loadInfoValues();
+                }
+            });
+            builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    // User cancelled the dialog
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
         }
     }
 
