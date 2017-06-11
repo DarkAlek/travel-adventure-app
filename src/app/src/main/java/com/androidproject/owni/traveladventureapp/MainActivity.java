@@ -4,12 +4,17 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.Contacts;
+import android.provider.MediaStore;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
@@ -17,8 +22,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.androidproject.owni.traveladventureapp.database.DBLocation;
+import com.androidproject.owni.traveladventureapp.database.DBPhoto;
 import com.androidproject.owni.traveladventureapp.database.DBRoute;
 import com.androidproject.owni.traveladventureapp.lib.DatabaseManager;
+import com.androidproject.owni.traveladventureapp.lib.PhotosManager;
+import com.google.android.gms.maps.MapFragment;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
@@ -27,11 +35,19 @@ import io.realm.RealmResults;
 import android.view.View;
 import android.widget.EditText;
 
-public class MainActivity extends FragmentActivity implements TravelMapFragment.OnFragmentInteractionListener {
+import java.io.File;
+import java.io.IOException;
 
+
+public class MainActivity extends FragmentActivity implements TravelMapFragment.OnFragmentInteractionListener {
+    static final int REQUEST_TAKE_PHOTO = 1;
+    static final int REQUEST_IMAGE_CAPTURE = 1;
+
+    private String mLastPhotoPath;
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
     private DBRoute activeRoute;
+    private TravelMapFragment mapFragment;
     public DBRoute getActiveRoute() {
         return activeRoute;
     }
@@ -48,7 +64,7 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
 
         setContentView(R.layout.activity_main);
 
-        TravelMapFragment mapFragment = new TravelMapFragment();
+        mapFragment = new TravelMapFragment();
         //mapFragment.setArguments(args);
         android.support.v4.app.FragmentTransaction fragmentTransaction =
                 getSupportFragmentManager().beginTransaction();
@@ -219,12 +235,58 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
     }
 
     public void showTravelList() {
-        // TODO
-        // show travel list
         Intent i = new Intent(MainActivity.this, RoutesActivity.class);
         i.putExtra("TITLE", "Routes");
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(i);
+    }
+
+    public void takePhoto(View view){
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            PhotosManager photos = new PhotosManager(getExternalFilesDir(Environment.DIRECTORY_PICTURES));
+            try {
+                photoFile = photos.createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+
+            }
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(
+                        getApplicationContext(),
+                        getApplicationContext().getPackageName() + ".fileprovider",
+                        photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                mLastPhotoPath = photoFile.getAbsolutePath();
+                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            DatabaseManager db = new DatabaseManager(getApplicationContext());
+            final Realm realm = db.getRealmObject();
+
+            realm.beginTransaction();
+            Long timestamp = System.currentTimeMillis() / 1000;
+            DBPhoto dbPhoto = new DBPhoto();
+            dbPhoto.setId(timestamp);
+            dbPhoto.setTimestamp(timestamp);
+            dbPhoto.setRoute(activeRoute);
+            dbPhoto.setPath(mLastPhotoPath);
+            RealmResults<DBLocation> routePoints = activeRoute.getRoute().sort("timestamp");
+            DBLocation location = routePoints.last();
+            dbPhoto.setLocation(location);
+            realm.insertOrUpdate(dbPhoto);
+            realm.commitTransaction();
+
+            mapFragment.addPhotoMarker(dbPhoto);
+        }
     }
 
     @Override
