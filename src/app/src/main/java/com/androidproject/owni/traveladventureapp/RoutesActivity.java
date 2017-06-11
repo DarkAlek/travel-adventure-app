@@ -110,8 +110,8 @@ public class RoutesActivity extends AppCompatActivity {
                     }
                 });
             }
-            else  h.routeDelete.setColorFilter(Color.WHITE);
-            if(currentItem.getIsRunning() == true) {
+            else {
+                h.routeDelete.setColorFilter(Color.WHITE);
                 h.routeMarker.setMarker(getResources().getDrawable(R.drawable.marker_active));
             }
         }

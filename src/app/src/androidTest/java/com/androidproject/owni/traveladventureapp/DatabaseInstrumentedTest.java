@@ -26,20 +26,13 @@ import static org.junit.Assert.*;
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
 @RunWith(AndroidJUnit4.class)
-public class ExampleInstrumentedTest {
-    @Test
-    public void useAppContext() throws Exception {
-        // Context of the app under test.
-        Context appContext = InstrumentationRegistry.getTargetContext();
-
-        assertEquals("com.androidproject.owni.traveladventureapp", appContext.getPackageName());
-    }
+public class DatabaseInstrumentedTest {
 
     @Rule
     public ActivityTestRule<MainActivity> rule  = new  ActivityTestRule<>(MainActivity.class);
     @Test
     @UiThreadTest
-    public void enterRouteName() throws Exception {
+    public void ensureRouteNameIsPresent() throws Exception {
 
         MainActivity mainActivity = rule.getActivity();
         mainActivity.addNewTravel("TestRoute");
@@ -51,4 +44,6 @@ public class ExampleInstrumentedTest {
         assertEquals(route.getName(), "TestRoute");
 
     }
+
+
 }

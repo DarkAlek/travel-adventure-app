@@ -344,26 +344,29 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
         Date netDate = (new Date(dbRoute.getTimestamp()));
 
         // TODO
-        Date end_date = new Date(dbRoute.getRoute().sort("id").last().getTimestamp()*1000);
-        date_start.setText(sdf.format(netDate));
+        if(!dbRoute.getRoute().sort("id").isEmpty()) {
 
-        long diff = (end_date.getTime() - netDate.getTime())/1000;
-        long days = diff/(3600*24);
-        long hours = (diff - days*3600*24)/3600;
-        long mins = (diff - days*24*3600 - hours*3600)/60;
+            Date end_date = new Date(dbRoute.getRoute().sort("id").last().getTimestamp() * 1000);
+            date_start.setText(sdf.format(netDate));
 
-        String time_elapsed_str = "";
+            long diff = (end_date.getTime() - netDate.getTime()) / 1000;
+            long days = diff / (3600 * 24);
+            long hours = (diff - days * 3600 * 24) / 3600;
+            long mins = (diff - days * 24 * 3600 - hours * 3600) / 60;
 
-        if (days > 0)
-            time_elapsed_str += days + " days ";
-        if (hours > 0)
-            time_elapsed_str += hours + " h ";
-        if (mins > 0)
-            time_elapsed_str += mins + " m";
+            String time_elapsed_str = "";
 
-        if (time_elapsed_str.isEmpty())
-            time_elapsed_str = "Just started";
+            if (days > 0)
+                time_elapsed_str += days + " days ";
+            if (hours > 0)
+                time_elapsed_str += hours + " h ";
+            if (mins > 0)
+                time_elapsed_str += mins + " m";
 
-        time_elapsed.setText(time_elapsed_str);
+            if (time_elapsed_str.isEmpty())
+                time_elapsed_str = "Just started";
+
+            time_elapsed.setText(time_elapsed_str);
+        }
     }
 }
