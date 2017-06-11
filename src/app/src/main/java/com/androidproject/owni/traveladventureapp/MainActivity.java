@@ -276,7 +276,7 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
             realm.insertOrUpdate(dbPhoto);
             realm.commitTransaction();
 
-            mapFragment.showPhoto(dbPhoto);
+            mapFragment.addPhotoMarker(dbPhoto);
         }
     }
 

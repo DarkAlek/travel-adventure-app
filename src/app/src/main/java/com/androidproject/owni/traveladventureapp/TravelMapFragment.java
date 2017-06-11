@@ -2,6 +2,7 @@ package com.androidproject.owni.traveladventureapp;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.support.v4.app.Fragment;
 import android.content.ComponentName;
 import android.content.Context;
@@ -33,17 +34,20 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -55,7 +59,7 @@ import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
 
-public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
+public class TravelMapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     OnFragmentInteractionListener mListener;
     GoogleMap mGoogleMap = null;
@@ -69,6 +73,7 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
     double currentHighestAltitude = Double.MIN_VALUE;
     private View rootView;
     final Messenger mMessenger = new Messenger(new IncomingHandler());
+    HashMap<Marker, String> mMarkers = new HashMap<Marker, String>();
 
     class IncomingHandler extends Handler {
         @Override
@@ -86,19 +91,23 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
                     if (dbRoute.getRoute().where().equalTo("geoWidth", location.getLatitude()).equalTo("geoHeight", location.getLongitude()) == null)
                         break;
 
+                    /*
                     if (mLastLocation == null) {
                         centerAtLocation(location);
                     }
+                    */
 
+                    /*
                     if (mLastLocation != null) {
                         mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(
                                 new LatLng(location.getLatitude(), location.getLongitude())));
                     }
+                    */
 
                     if(currentMarker != null) {
                         currentMarker.remove();
                     }
-                    addPointToMap(location);
+                    //addPointToMap(location);
                     currentMarker = addCurrentPositionToMap(location);
                     if(mLastLocation == null) return;
                     PolylineOptions line = new PolylineOptions();
@@ -117,19 +126,60 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    public void showPhoto(DBPhoto dbPhoto) {
+    public void addPhotoMarker(DBPhoto dbPhoto) {
         // TODO
         // show photo on map, close to its location
         BitmapDescriptor icon = ImageIconFactory.createIconForPhoto(dbPhoto);
 
         LatLng myPoint = new LatLng(dbPhoto.getLocation().getGeoWidth(), dbPhoto.getLocation().getGeoHeight());
+        //mGoogleMap.addCircle(new CircleOptions().center(myPoint).radius(3).fillColor(Color.RED).strokeColor(Color.RED));
+
         MarkerOptions marker = new MarkerOptions();
         marker.position(myPoint);
-        marker.title("You");
-        marker.snippet("You are here.");
-
+        marker.anchor((float)-0.5,(float)-0.5);
         marker.icon(icon);
-        mGoogleMap.addMarker(marker);
+
+        Marker marker_obj = mGoogleMap.addMarker(marker);
+        mMarkers.put(marker_obj, dbPhoto.getPath());
+    }
+
+    @Override
+    public boolean onMarkerClick(final Marker marker) {
+
+        // handle photo click here
+        if (mMarkers.containsKey(marker))
+        {
+            String path_to_image= mMarkers.get(marker);
+
+            // TODO
+            // HERE WORK PHOTOS
+            Intent intent = new Intent();
+            intent.setAction(Intent.ACTION_SEND);
+
+            File photoFile = new File(path_to_image);
+            intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(photoFile));
+            intent.setType("image/*");
+
+            //intent.setDataAndType(Uri.parse("content:/" + path_to_image), "image/*");
+            //intent.setDataAndType(Uri.fromFile(new File(path_to_image)), "image/*");
+            //intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+            //intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            //intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+            //intent = new Intent(Intent.ACTION_GET_CONTENT);
+            startActivity(intent);
+        }
+
+        return true;
+    }
+
+    void onCircleCLick(LatLng position) {
+        /*
+        LatLng center = circle.getCenter();
+        double radius = circle.getRadius();
+        float[] distance = new float[1];
+        Location.distanceBetween(position.latitude, position.longitude, center.latitude, center.longitude, distance);
+        boolean clicked = distance[0] < radius;
+        */
     }
 
     private void loadCurrentRoute() {
@@ -166,12 +216,22 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
                 currentHighestAltitude = Math.max(altitude, currentHighestAltitude);
 
             line.add(new LatLng(location.getGeoWidth(), location.getGeoHeight()));
-            addPointToMap(aLocation);
+            //addPointToMap(aLocation);
             mLastLocation = aLocation;
         }
 
         loadInfoValues();
         mGoogleMap.addPolyline(line);
+
+        RealmResults<DBPhoto> photos = realm.where(DBPhoto.class).equalTo("route.id", routeID).findAll();
+
+        for(int i = 0; i < photos.size(); ++i){
+            DBPhoto photo = photos.get(i);
+            DBLocation location = photo.getLocation();
+
+            mGoogleMap.addCircle(new CircleOptions().center(new LatLng(location.getGeoWidth(), location.getGeoHeight())).radius(3).fillColor(Color.RED).strokeColor(Color.RED).zIndex(99));
+        }
+
         centerAtLocation(mLastLocation);
     }
 
@@ -317,6 +377,43 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap map) {
         mGoogleMap = map;
+        mGoogleMap.setOnMarkerClickListener(this);
+        mGoogleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                double clickAccuracy = 0.0002;
+                double latMin = latLng.latitude - clickAccuracy;
+                double latMax = latLng.latitude + clickAccuracy;
+                double lonMin = latLng.longitude - clickAccuracy;
+                double lonMax = latLng.longitude + clickAccuracy;
+
+                RealmResults<DBPhoto> photos = realm.where(DBPhoto.class).equalTo("route.id", routeID).findAll();
+
+                DBPhoto foundPhoto = null;
+                for(int i = 0; i < photos.size(); ++i) {
+                    DBLocation location = photos.get(i).getLocation();
+                    if (location.getGeoWidth() > latMin && location.getGeoWidth() < latMax && location.getGeoHeight() > lonMin && location.getGeoHeight() < lonMax)
+                    {
+                        foundPhoto = photos.get(i);
+                        break;
+                    }
+                }
+
+                //DBPhoto photo = realm.where(DBPhoto.class).between("location.geoWidth", latMin, latMax).between("location.geoHeight", lonMin, lonMax).findFirst();
+                if (foundPhoto != null)
+                    addPhotoMarker(foundPhoto);
+
+                // search for closest circle here
+                /*
+                LatLng center = circle.getCenter();
+                double radius = circle.getRadius();
+                float[] distance = new float[1];
+                Location.distanceBetween(position.latitude, position.longitude, center.latitude, center.longitude, distance);
+                boolean clicked = distance[0] < radius;
+                */
+                // end of searching
+            }
+        });
 
         if (mLastLocation != null) {
             addPointToMap(mLastLocation);
