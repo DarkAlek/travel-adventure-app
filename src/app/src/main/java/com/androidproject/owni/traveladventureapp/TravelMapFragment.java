@@ -22,6 +22,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.androidproject.owni.traveladventureapp.database.DBLocation;
@@ -428,6 +429,10 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback, G
             loadCurrentRoute();
             loadInfoValues();
         }
+        else
+        {
+            setButtonsInvisible();
+        }
     }
 
     @Override
@@ -435,8 +440,24 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback, G
         super.onResume();
         SupportMapFragment smf = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map));
         smf.getMapAsync(this);
-
+        if(routeID == null) setButtonsInvisible();
         loadInfoValues();
+    }
+
+    public void setButtonsInvisible()
+    {
+        ImageButton b1 = (ImageButton) getView().findViewById(R.id.click_photo);
+        ImageButton b2 = (ImageButton) getView().findViewById(R.id.click_stop);
+        b1.setVisibility(View.INVISIBLE);
+        b2.setVisibility(View.INVISIBLE);
+    }
+
+    public void setButtonsVisible()
+    {
+        ImageButton b1 = (ImageButton) getView().findViewById(R.id.click_photo);
+        ImageButton b2 = (ImageButton) getView().findViewById(R.id.click_stop);
+        b1.setVisibility(View.VISIBLE);
+        b2.setVisibility(View.VISIBLE);
     }
 
     public void loadInfoValues(){

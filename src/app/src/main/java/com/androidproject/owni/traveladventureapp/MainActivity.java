@@ -18,6 +18,7 @@ import android.support.v4.content.FileProvider;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -33,7 +34,10 @@ import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 
 import java.io.File;
 import java.io.IOException;
@@ -92,6 +96,7 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
             mapFragment.setArguments(args);
         }
     }
+
 
     public void askAboutLocalizationPermissions() {
         if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
@@ -212,6 +217,7 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
             realm.commitTransaction();
             activeRoute = null;
             navigationView.getMenu().findItem(R.id.current_travel).setEnabled(false);
+
         }
 
         realm.beginTransaction();
@@ -226,6 +232,7 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
         mapFragment.routeID = activeRoute.getId();
         realm.commitTransaction();
         if(activeRoute != null) navigationView.getMenu().findItem(R.id.current_travel).setEnabled(true);
+
     }
 
     public void showCurrentTravel() {
@@ -252,25 +259,39 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
     public void takePhoto(View view){
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            // Create the File where the photo should go
-            File photoFile = null;
-            PhotosManager photos = new PhotosManager(getExternalFilesDir(Environment.DIRECTORY_PICTURES));
-            try {
-                photoFile = photos.createImageFile();
-            } catch (IOException ex) {
-                // Error occurred while creating the File
+        if (activeRoute != null)
+        {
+            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                // Create the File where the photo should go
+                File photoFile = null;
+                PhotosManager photos = new PhotosManager(getExternalFilesDir(Environment.DIRECTORY_PICTURES));
+                try {
+                    photoFile = photos.createImageFile();
+                } catch (IOException ex) {
+                    // Error occurred while creating the File
 
+                }
+                if (photoFile != null) {
+                    Uri photoURI = FileProvider.getUriForFile(
+                            getApplicationContext(),
+                            getApplicationContext().getPackageName() + ".fileprovider",
+                            photoFile);
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                    mLastPhotoPath = photoFile.getAbsolutePath();
+                    startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+                }
             }
-            if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(
-                        getApplicationContext(),
-                        getApplicationContext().getPackageName() + ".fileprovider",
-                        photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                mLastPhotoPath = photoFile.getAbsolutePath();
-                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
-            }
+        }
+        else
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setMessage("You don't have any current trip");
+            builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
         }
     }
 
@@ -286,17 +307,37 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
                 public void onClick(DialogInterface dialog, int id) {
                     realm.beginTransaction();
                     activeRoute.setIsRunning(Boolean.FALSE);
+                    realm.copyToRealmOrUpdate(activeRoute);
                     realm.commitTransaction();
                     activeRoute = null;
                     if(activeRoute == null) navigationView.getMenu().findItem(R.id.current_travel).setEnabled(false);
                     mapFragment.mGoogleMap.clear();
                     mapFragment.routeID = null;
                     mapFragment.loadInfoValues();
+
+                    //mapFragment = new TravelMapFragment();
+                    //android.support.v4.app.FragmentTransaction fragmentTransaction =
+                    //        getSupportFragmentManager().beginTransaction();
+                    //fragmentTransaction.add(R.id.map, mapFragment);
+                    //fragmentTransaction.detach(mapFragment);
+                    //fragmentTransaction.attach(mapFragment);
+                    //fragmentTransaction.commit();
                 }
             });
             builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     // User cancelled the dialog
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
+        else
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setMessage("You don't have any current trip");
+            builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
                 }
             });
             AlertDialog dialog = builder.create();
