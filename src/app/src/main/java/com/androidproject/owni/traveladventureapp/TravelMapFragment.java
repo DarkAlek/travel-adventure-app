@@ -103,17 +103,9 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback, G
                         centerAtLocation(location);
                     }
 
-                    /*
-                    if (mLastLocation != null) {
-                        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(
-                                new LatLng(location.getLatitude(), location.getLongitude())));
-                    }
-                    */
-
                     if(currentMarker != null) {
                         currentMarker.remove();
                     }
-                    //addPointToMap(location);
                     currentMarker = addCurrentPositionToMap(location);
                     if(mLastLocation == null) return;
                     PolylineOptions line = new PolylineOptions();
@@ -135,12 +127,9 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback, G
     }
 
     public void addPhotoMarker(DBPhoto dbPhoto) {
-        // TODO
-        // show photo on map, close to its location
         BitmapDescriptor icon = ImageIconFactory.createIconForPhoto(dbPhoto);
 
         LatLng myPoint = new LatLng(dbPhoto.getLocation().getGeoWidth(), dbPhoto.getLocation().getGeoHeight());
-        //mGoogleMap.addCircle(new CircleOptions().center(myPoint).radius(3).fillColor(Color.RED).strokeColor(Color.RED));
 
         MarkerOptions marker = new MarkerOptions();
         marker.position(myPoint);
@@ -177,13 +166,7 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback, G
     }
 
     void onCircleCLick(LatLng position) {
-        /*
-        LatLng center = circle.getCenter();
-        double radius = circle.getRadius();
-        float[] distance = new float[1];
-        Location.distanceBetween(position.latitude, position.longitude, center.latitude, center.longitude, distance);
-        boolean clicked = distance[0] < radius;
-        */
+
     }
 
     private void loadCurrentRoute() {
@@ -403,19 +386,8 @@ public class TravelMapFragment extends Fragment implements OnMapReadyCallback, G
                     }
                 }
 
-                //DBPhoto photo = realm.where(DBPhoto.class).between("location.geoWidth", latMin, latMax).between("location.geoHeight", lonMin, lonMax).findFirst();
                 if (foundPhoto != null)
                     addPhotoMarker(foundPhoto);
-
-                // search for closest circle here
-                /*
-                LatLng center = circle.getCenter();
-                double radius = circle.getRadius();
-                float[] distance = new float[1];
-                Location.distanceBetween(position.latitude, position.longitude, center.latitude, center.longitude, distance);
-                boolean clicked = distance[0] < radius;
-                */
-                // end of searching
             }
         });
 

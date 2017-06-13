@@ -69,22 +69,6 @@ public class ProbeLocalizationService
                 case MSG_UNREGISTER_CLIENT:
                     mClients.remove(msg.replyTo);
                     break;
-                /*
-                case MSG_SET_VALUE:
-                    mValue = msg.arg1;
-                    for (int i=mClients.size()-1; i>=0; i--) {
-                        try {
-                            mClients.get(i).send(Message.obtain(null,
-                                    MSG_SET_VALUE, mValue, 0));
-                        } catch (RemoteException e) {
-                            // The client is dead.  Remove it from the list;
-                            // we are going through the list from back to front
-                            // so this is safe to do inside the loop.
-                            mClients.remove(i);
-                        }
-                    }
-                    break;
-                */
                 default:
                     super.handleMessage(msg);
             }
@@ -139,15 +123,11 @@ public class ProbeLocalizationService
 
     @Override
     public void onConnectionSuspended(int time) {
-        // TODO
-        // implement action
         Log.d("TAG", "onConnectionSuspended:");
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult result) {
-        // TODO
-        // implement action
         Log.d("TAG", "onConnectionSuspended:");
     }
 
@@ -185,18 +165,6 @@ public class ProbeLocalizationService
                         // a dialog.
                         Log.e("ProbeLocalization", "Settings not satisfied: resolution required");
 
-                        /*
-                        // TODO
-                        // show dialog with confirmation at first start of application
-                        try {
-                            // Show the dialog by calling startResolutionForResult(),
-                            // and check the result in onActivityResult().
-                            status.startResolutionForResult(
-                                    MainActivity.this, 1000);
-                        } catch (IntentSender.SendIntentException e) {
-                            // Ignore the error.
-                        }
-                        */
                         break;
                     case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
                         // Location settings are not satisfied. However, we have no way to fix the
@@ -210,18 +178,6 @@ public class ProbeLocalizationService
 
         startLocationUpdates();
     }
-
-    /*
-    // TODO
-    // remove or implement
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (mGoogleApiClient.isConnected() && !mRequestingLocationUpdates) {
-            startLocationUpdates();
-        }
-    }
-    */
 
     protected void startLocationUpdates() {
         try {

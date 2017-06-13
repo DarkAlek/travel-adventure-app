@@ -34,19 +34,10 @@ public class LocalizationManager {
     }
 
     public boolean LocationChangedHandler(Location location){
-        // TODO
-        // add logic to save to db only valuable locations
-
         return AddLocalization(location);
     }
 
     public boolean AddLocalization(Location location){
-        // TODO
-        // remove later debug logs
-        Log.e("AddLocalization", "loc_lat: " + String.valueOf(location.getLatitude()));
-        Log.e("AddLocalization", "loc_lon: " + String.valueOf(location.getLongitude()));
-        Log.e("Altitude", "altitude:" + Double.toString(location.getAltitude()));
-
         DBRoute dbRoute = realm.where(DBRoute.class).equalTo("isRunning", Boolean.TRUE).findFirst();
 
         if (dbRoute != null) {

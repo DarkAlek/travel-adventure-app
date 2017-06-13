@@ -69,7 +69,6 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
         setContentView(R.layout.activity_main);
 
         mapFragment = new TravelMapFragment();
-        //mapFragment.setArguments(args);
         android.support.v4.app.FragmentTransaction fragmentTransaction =
                 getSupportFragmentManager().beginTransaction();
 
@@ -314,14 +313,6 @@ public class MainActivity extends FragmentActivity implements TravelMapFragment.
                     mapFragment.mGoogleMap.clear();
                     mapFragment.routeID = null;
                     mapFragment.loadInfoValues();
-
-                    //mapFragment = new TravelMapFragment();
-                    //android.support.v4.app.FragmentTransaction fragmentTransaction =
-                    //        getSupportFragmentManager().beginTransaction();
-                    //fragmentTransaction.add(R.id.map, mapFragment);
-                    //fragmentTransaction.detach(mapFragment);
-                    //fragmentTransaction.attach(mapFragment);
-                    //fragmentTransaction.commit();
                 }
             });
             builder.setNegativeButton("No", new DialogInterface.OnClickListener() {

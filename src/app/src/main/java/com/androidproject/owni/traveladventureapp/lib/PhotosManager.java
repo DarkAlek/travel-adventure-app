@@ -29,9 +29,6 @@ public class PhotosManager {
                 m_storageDir      /* directory */
         );
 
-        // Save a file: path for use with ACTION_VIEW intents
-        //mCurrentPhotoPath = image.getAbsolutePath();
-
         return image;
     }
 }

@@ -54,8 +54,6 @@ public class RoutesActivity extends AppCompatActivity {
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View v = getLayoutInflater().inflate(R.layout.route_item, parent, false);
-            //View v = View.inflate(parent.getContext(), R.layout.route_item, null);
-            //View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.route_item, parent, false);
 
             return new RouteViewHolder(v, viewType,
                     (CardView) v.findViewById(R.id.route_card),
