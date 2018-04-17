@@ -19,7 +19,7 @@ realm.beginTransaction();
 (Klasa) nazwa = realm.createObject((Klasa).class);
 realm.commitTransaction();
 
-Je¶li chcemy, aby transakcja by³a asynchroniczna (raczej bêdziemy chcieli) to wygl±da to trochê inaczej:
+Jeœli chcemy, aby transakcja by³a asynchroniczna (raczej bêdziemy chcieli) to wygl±da to trochê inaczej:
 
 realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
